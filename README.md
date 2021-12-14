@@ -10,6 +10,11 @@ In order for script to access github you need to:
     ```
     gh auth login --scopes "write:org"
     ```
+1. clone this repository
+1. make the sync script executable:
+    ```
+    chmod +x sync_issues.rb
+    ```
 
 ## Scripts
 
