@@ -1,6 +1,17 @@
 # github-automations
 
-## Installation
+## Bot
+
+> Zenith automation bot built with [Probot](https://github.com/probot/probot).
+
+Now it can handle:
+* automatically add new issues to the project
+* update progress when issue is updated
+* update tracked_in when child issue is updated (but not vice versa)
+
+## Scripts
+
+`./sync_issues.rb` -- walks over all open issues in console and zeniths repos and add them to https://github.com/orgs/zenithdb/projects/6. Also sets `Tracked In` field if current issue is subtask of some other issue.
 
 Tested with ruby 2.7.3 but expected to work all 2.x/3.x versions.
 
@@ -15,10 +26,6 @@ In order for script to access github you need to:
     ```
     chmod +x sync_issues.rb
     ```
-
-## Scripts
-
-`./sync_issues.rb` -- walks over all open issues in console and zeniths repos and add them to https://github.com/orgs/zenithdb/projects/6. Also sets `Tracked In` field if current issue is subtask of some other issue.
 
 ## Relevant info
 
@@ -46,4 +53,12 @@ query {
 }
 ```
 
+## Contributing
 
+If you have suggestions for how zenith-bot could be improved, or want to report a bug, open an issue! We'd love all and any contributions.
+
+For more, check out the [Contributing Guide](CONTRIBUTING.md).
+
+## License
+
+[ISC](LICENSE) © 2022 Stas Kelvich <stas.kelvich@gmail.com>
