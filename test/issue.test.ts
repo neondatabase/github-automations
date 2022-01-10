@@ -35,6 +35,9 @@ describe("Issue class", () => {
   });
 
   test("it sets the parent within the same repo", () => {
+    check_has_parent(rawIssue, "* [ ] #22");
+    check_has_parent(rawIssue, "* [x] #22");
+
     check_has_parent(rawIssue, "- [ ] #22");
     check_has_parent(rawIssue, "- [x] #22");
     check_has_parent(rawIssue, "- [ ]  #22  ");
@@ -54,6 +57,8 @@ describe("Issue class", () => {
 
   test("it sets the parent within the different repos", () => {
     rawIssue.repository.nameWithOwner = "org/repo2";
+
+    check_has_parent(rawIssue, "* [ ]  org/repo2#22  ");
 
     check_has_parent(rawIssue, "- [ ]  org/repo2#22  ");
     check_has_parent(rawIssue, "- [x]  org/repo2#22  ");

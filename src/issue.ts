@@ -80,7 +80,7 @@ export class Issue {
   // subtasks are markdown list entries in the body
   private setSubtasks() {
     this.subtasks = Array
-      .from(this.body.matchAll(/- \[([ x])\] ([^\n]*)/g))
+      .from(this.body.matchAll(/[-|*] \[([ x])\] ([^\n]*)/g))
       .map((m: any) => {
         let closed = m[1] === 'x';
         let title = m[2].trim();
