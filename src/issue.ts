@@ -59,7 +59,9 @@ export class Issue {
       this.mentions = node
         .timelineItems
         .nodes
-        .filter((n: any) => n.hasOwnProperty('source'))
+        // PR mention looks like `{ "id": "...", "source": {}}`, so check that source
+        // has an id -- that way we will leave only mentioning Issue
+        .filter((n: any) => n.hasOwnProperty('source') && n.source.hasOwnProperty('id'))
         .map((n: any) => new Issue(n.source));
     }
 
