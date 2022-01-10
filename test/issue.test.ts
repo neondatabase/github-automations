@@ -34,6 +34,12 @@ describe("Issue class", () => {
     expect(issue.progress()).toStrictEqual('1 / 3');
   });
 
+  test("it skips progress on issues without subtasks", () => {
+    rawIssue.body = `Some task text.`;
+    let issue = new Issue(rawIssue);
+    expect(issue.progress()).toStrictEqual('-');
+  });
+
   test("it sets the parent within the same repo", () => {
     check_has_parent(rawIssue, "* [ ] #22");
     check_has_parent(rawIssue, "* [x] #22");

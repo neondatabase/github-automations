@@ -114,9 +114,14 @@ export class Issue {
   }
 
   progress() {
-    let n_closed = this.subtasks.filter(([closed]) => closed).length;
     let n_total = this.subtasks.length;
-    return `${n_closed} / ${n_total}`;
+
+    if (n_total === 0) {
+      return '-';
+    } else {
+      let n_closed = this.subtasks.filter(([closed]) => closed).length;
+      return `${n_closed} / ${n_total}`;
+    }
   }
 
   async addToTheProject(kit: Octokit) {
