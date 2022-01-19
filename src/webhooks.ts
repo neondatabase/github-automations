@@ -9,7 +9,7 @@ import { deployFailedTemplate,
 // webhooks entry point to the probot app
 export = (app: Probot) => {
   app.on(["issues.opened", "issues.edited"], async (context) => {
-    // console.log("issues.opened: ", context.payload);
+    console.log("issues.opened: ", context.payload);
 
     // add issue to project and set few fields
     let issue = await Issue.load(context.octokit, context.payload.issue.node_id);
@@ -17,7 +17,7 @@ export = (app: Probot) => {
   });
 
   app.on("workflow_run", async (context) => {
-    // console.log("workflow_run: ", context.payload);
+    console.log("workflow_run: ", context.payload);
 
     const workflow_run = context.payload.workflow_run;
     if (context.payload.action === 'completed' && workflow_run) {
@@ -47,7 +47,7 @@ export = (app: Probot) => {
   });
 
   app.on(['push'], async (context) => {
-    // console.log("push: ", context.payload);
+    console.log("push: ", context.payload);
 
     if (context.payload.ref === 'refs/heads/main') {
       await webhook.send({
