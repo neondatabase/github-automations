@@ -1,5 +1,5 @@
 import Discord from 'discord.js';
-import {bold, hideLinkEmbed} from '@discordjs/builders'
+import {bold, codeBlock, hideLinkEmbed} from '@discordjs/builders'
 
 
 if (!process.env.DISCORD_WEBHOOK_URL) {
@@ -18,11 +18,11 @@ const getShortCommitMessage = (commit: { message: string }) => {
 };
 
 const formatCommit = (commit: { message: string, author: {name: string}, id: string }) => {
-  return `${commit.id.substring(0,8)} - ${commit.author.name}: ${getShortCommitMessage(commit)}`
+  return codeBlock(`${commit.id.substring(0,8)} - ${commit.author.name}: ${getShortCommitMessage(commit)}`);
 };
 
 export const deploySucceedTemplate = (workflow_run: any) => {
-  return `Deploy to **stage** from ${bold(workflow_run.repository.name + '/' + workflow_run.head_branch)} was successful, congratulations!\n` +
+  return `New console version has been successfully deployed on staging\n` +
       `\n\nHEAD now is:\n` +
       formatCommit(workflow_run.head_commit);
 }
@@ -52,5 +52,5 @@ export const pushToMainTemplate = (pushEventData: {
 
   return `Push to ${bold(pushEventData.repository.full_name + '/main')}!\n\n` +
       `${pushEventData.commits.map(formatCommit).join('\n')}` +
-      `\nDiff: ${link}`;
+      `\n\nDiff: ${link}`;
 }
