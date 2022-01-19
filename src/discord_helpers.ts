@@ -22,7 +22,7 @@ const formatCommit = (commit: { message: string, author: {name: string}, id: str
 };
 
 export const deploySucceedTemplate = (workflow_run: any) => {
-  return `${bold('Deploy to stage from ${workflow_run.repository.name}/${workflow_run.head_branch} was successful, congratulations!')}\n` +
+  return `Deploy to **stage** from ${bold(workflow_run.repository.name + '/' + workflow_run.head_branch)} was successful, congratulations!\n` +
       `\n\nHEAD now is:\n` +
       formatCommit(workflow_run.head_commit);
 }
@@ -30,7 +30,7 @@ export const deploySucceedTemplate = (workflow_run: any) => {
 export const deployFailedTemplate = (workflow_run: any) => {
   const link = hyperlink('investigate', workflow_run.html_url);
 
-  return`${bold('Deploy to stage from ${workflow_run.repository.name}/${workflow_run.head_branch} failed :(')}\n\n` +
+  return `Deploy to stage from ${bold(workflow_run.repository.name + '/' + workflow_run.head_branch)} failed :(\n\n` +
       formatCommit(workflow_run.head_commit) +
       `\n\n**Logs:** ${link}`;
 }
@@ -50,7 +50,7 @@ export const pushToMainTemplate = (pushEventData: {
 }) => {
   const link = hyperlink('Diff', pushEventData.compare);
 
-  return `${bold('Push to ${pushEventData.repository.full_name}/main!')}\n\n` +
+  return `Push to ${bold(pushEventData.repository.full_name + '/main')}!\n\n` +
       `${pushEventData.commits.map(formatCommit).join('\n')}` +
       `\n${link}`;
 }
