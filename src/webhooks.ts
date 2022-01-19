@@ -1,6 +1,10 @@
 import { Probot } from "probot";
 import { Issue } from "./issue";
-import {deployFailedTemplate, deploySucceedTemplate, pushToMainTemplate, webhook} from "./discord_helpers";
+import { deployFailedTemplate,
+  deploySucceedTemplate,
+  pushToMainTemplate,
+  webhook
+} from "./discord_helpers";
 
 // webhooks entry point to the probot app
 export = (app: Probot) => {
