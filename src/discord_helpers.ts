@@ -1,5 +1,5 @@
 import Discord from 'discord.js';
-import {bold, hyperlink} from '@discordjs/builders'
+import {bold, hideLinkEmbed, hyperlink} from '@discordjs/builders'
 
 
 if (!process.env.DISCORD_WEBHOOK_URL) {
@@ -28,11 +28,11 @@ export const deploySucceedTemplate = (workflow_run: any) => {
 }
 
 export const deployFailedTemplate = (workflow_run: any) => {
-  const link = hyperlink('investigate', workflow_run.html_url);
+  const link = hideLinkEmbed(workflow_run.html_url);
 
   return `Deploy to stage from ${bold(workflow_run.repository.name + '/' + workflow_run.head_branch)} failed :(\n\n` +
       formatCommit(workflow_run.head_commit) +
-      `\n\n**Logs:** ${link}`;
+    `\n\n${hyperlink(link, 'View logs on github')}`;
 }
 
 export const pushToMainTemplate = (pushEventData: {
@@ -48,9 +48,8 @@ export const pushToMainTemplate = (pushEventData: {
     }
   }>
 }) => {
-  const link = hyperlink('Diff', pushEventData.compare);
+  const link = hideLinkEmbed(pushEventData.compare);
 
-  return `Push to ${bold(pushEventData.repository.full_name + '/main')}!\n\n` +
-      `${pushEventData.commits.map(formatCommit).join('\n')}` +
-      `\n${link}`;
+  return `${hyperlink(link, "Push")} to ${bold(pushEventData.repository.full_name + '/main')}!\n\n` +
+      `${pushEventData.commits.map(formatCommit).join('\n')}`;
 }
