@@ -30,7 +30,7 @@ export const deploySucceedTemplate = (workflow_run: any) => {
 export const deployFailedTemplate = (workflow_run: any) => {
   const link = hyperlink('investigate', workflow_run.html_url);
 
-  return`**Deploy to stage from ${workflow_run.repository.name}/${workflow_run.head_branch} failed :(\n\n` +
+  return`${bold('Deploy to stage from ${workflow_run.repository.name}/${workflow_run.head_branch} failed :(')}\n\n` +
       formatCommit(workflow_run.head_commit) +
       `\n\n**Logs:** ${link}`;
 }
@@ -48,9 +48,9 @@ export const pushToMainTemplate = (pushEventData: {
     }
   }>
 }) => {
-  const link = hyperlink('**Diff:**', pushEventData.compare);
+  const link = hyperlink('Diff', pushEventData.compare);
 
-  return `**Push to ${pushEventData.repository.full_name}/main!\n\n` +
+  return `${bold('Push to ${pushEventData.repository.full_name}/main!')}\n\n` +
       `${pushEventData.commits.map(formatCommit).join('\n')}` +
       `\n${link}`;
 }
