@@ -54,3 +54,7 @@ export const pushToMainTemplate = (pushEventData: {
       `${pushEventData.commits.map(formatCommit).join('\n')}` +
       `\n\nDiff: ${link}`;
 }
+
+export const debugTemplate = (message: any) => {
+  return `Debug info: ${codeBlock(message)}`;
+}

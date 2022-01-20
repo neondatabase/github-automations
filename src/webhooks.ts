@@ -1,7 +1,7 @@
 import { Probot } from "probot";
 import { Issue } from "./issue";
-import { deployFailedTemplate,
-  deploySucceedTemplate,
+import {
+  debugTemplate,
   pushToMainTemplate,
   webhook
 } from "./discord_helpers";
@@ -22,33 +22,33 @@ export = (app: Probot) => {
     //   return;
     // }
 
-    console.log("workflow_run: ", context.payload);
+    await webhook.send(debugTemplate(context.payload));
 
-    const workflow_run = context.payload.workflow_run;
-    if (context.payload.action === 'completed' && workflow_run) {
-      let content = "";
-      switch (workflow_run.node_id) {
-        // deploy to staging
-        case 'WFR_kwLOFWwrAc5mOfYU':
-          switch (workflow_run.conclusion) {
-            case "success":
-              content = deploySucceedTemplate(workflow_run);
-              break;
-            case "failure":
-              content = deployFailedTemplate(workflow_run);
-              break;
-          }
-          break;
-        default:
-          break;
-      }
-
-      if (content) {
-        await webhook.send({
-          content,
-        });
-      }
-    }
+    // const workflow_run = context.payload.workflow_run;
+    // if (context.payload.action === 'completed' && workflow_run) {
+    //   let content = "";
+    //   switch (workflow_run.node_id) {
+    //     // deploy to staging
+    //     case 'WFR_kwLOFWwrAc5mOfYU':
+    //       switch (workflow_run.conclusion) {
+    //         case "success":
+    //           content = deploySucceedTemplate(workflow_run);
+    //           break;
+    //         case "failure":
+    //           content = deployFailedTemplate(workflow_run);
+    //           break;
+    //       }
+    //       break;
+    //     default:
+    //       break;
+    //   }
+    //
+    //   if (content) {
+    //     await webhook.send({
+    //       content,
+    //     });
+    //   }
+    // }
   });
 
   app.on(['push'], async (context) => {
@@ -71,8 +71,10 @@ export = (app: Probot) => {
     // if (context.payload.repository.name !== "zenith") {
     //   return;
     // }
+    await webhook.send(debugTemplate(context.payload));
 
-    console.log("status: ", context.payload);
+
+    // console.log("status: ", context.payload);
   })
 
   //
