@@ -56,5 +56,5 @@ export const pushToMainTemplate = (pushEventData: {
 }
 
 export const debugTemplate = (message: any) => {
-  return `Debug info: ${codeBlock(message)}`;
+  return `Debug info: ${codeBlock(JSON.stringify(message, null, 2))}`;
 }
