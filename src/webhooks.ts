@@ -18,9 +18,9 @@ export = (app: Probot) => {
 
   app.on("workflow_run", async (context) => {
     // this function handles deploys from github actions, for now it's only the console repo
-    if (context.payload.repository.name !== 'console') {
-      return;
-    }
+    // if (context.payload.repository.name !== 'console') {
+    //   return;
+    // }
 
     console.log("workflow_run: ", context.payload);
 
@@ -53,9 +53,9 @@ export = (app: Probot) => {
 
   app.on(['push'], async (context) => {
     // we don't need to deploy our rfcs so just listen to push to main
-    if (context.payload.repository.name !== "rfcs") {
-      return;
-    }
+    // if (context.payload.repository.name !== "rfcs") {
+    //   return;
+    // }
 
     console.log("push: ", context.payload);
 
@@ -68,9 +68,9 @@ export = (app: Probot) => {
 
   app.on(["status"], async (context) => {
     // this function handles deploys from circleci, for now it's only for zenith repo
-    if (context.payload.repository.name !== "zenith") {
-      return;
-    }
+    // if (context.payload.repository.name !== "zenith") {
+    //   return;
+    // }
 
     console.log("status: ", context.payload);
   })
