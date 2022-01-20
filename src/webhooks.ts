@@ -1,10 +1,10 @@
 import { Probot } from "probot";
 import { Issue } from "./issue";
-import {
-  debugTemplate,
-  pushToMainTemplate,
-  webhook
-} from "./discord_helpers";
+// import {
+//   createWebhook,
+//   debugTemplate,
+//   pushToMainTemplate,
+// } from "./discord_helpers";
 
 // webhooks entry point to the probot app
 export = (app: Probot) => {
@@ -16,66 +16,66 @@ export = (app: Probot) => {
     await issue.addToTheProject(context.octokit);
   });
 
-  app.on("workflow_run", async (context) => {
-    // this function handles deploys from github actions, for now it's only the console repo
-    // if (context.payload.repository.name !== 'console') {
-    //   return;
-    // }
-
-    await webhook.send(debugTemplate(context.payload));
-
-    // const workflow_run = context.payload.workflow_run;
-    // if (context.payload.action === 'completed' && workflow_run) {
-    //   let content = "";
-    //   switch (workflow_run.node_id) {
-    //     // deploy to staging
-    //     case 'WFR_kwLOFWwrAc5mOfYU':
-    //       switch (workflow_run.conclusion) {
-    //         case "success":
-    //           content = deploySucceedTemplate(workflow_run);
-    //           break;
-    //         case "failure":
-    //           content = deployFailedTemplate(workflow_run);
-    //           break;
-    //       }
-    //       break;
-    //     default:
-    //       break;
-    //   }
-    //
-    //   if (content) {
-    //     await webhook.send({
-    //       content,
-    //     });
-    //   }
-    // }
-  });
-
-  app.on(['push'], async (context) => {
-    // we don't need to deploy our rfcs so just listen to push to main
-    // if (context.payload.repository.name !== "rfcs") {
-    //   return;
-    // }
-
-    console.log("push: ", context.payload);
-
-    if (context.payload.ref === 'refs/heads/main') {
-      await webhook.send({
-        content: pushToMainTemplate(context.payload),
-      });
-    }
-  });
-
-  app.on(["status"], async (context) => {
-    // this function handles deploys from circleci, for now it's only for zenith repo
-    // if (context.payload.repository.name !== "zenith") {
-    //   return;
-    // }
-    await webhook.send(debugTemplate(context.payload));
-
-
-    // console.log("status: ", context.payload);
-  })
+  // app.on("workflow_run", async (context) => {
+  //   // this function handles deploys from github actions, for now it's only the console repo
+  //   // if (context.payload.repository.name !== 'console') {
+  //   //   return;
+  //   // }
+  //
+  //   await webhook.send(debugTemplate(context.payload));
+  //
+  //   // const workflow_run = context.payload.workflow_run;
+  //   // if (context.payload.action === 'completed' && workflow_run) {
+  //   //   let content = "";
+  //   //   switch (workflow_run.node_id) {
+  //   //     // deploy to staging
+  //   //     case 'WFR_kwLOFWwrAc5mOfYU':
+  //   //       switch (workflow_run.conclusion) {
+  //   //         case "success":
+  //   //           content = deploySucceedTemplate(workflow_run);
+  //   //           break;
+  //   //         case "failure":
+  //   //           content = deployFailedTemplate(workflow_run);
+  //   //           break;
+  //   //       }
+  //   //       break;
+  //   //     default:
+  //   //       break;
+  //   //   }
+  //   //
+  //   //   if (content) {
+  //   //     await webhook.send({
+  //   //       content,
+  //   //     });
+  //   //   }
+  //   // }
+  // });
+  //
+  // app.on(['push'], async (context) => {
+  //   // we don't need to deploy our rfcs so just listen to push to main
+  //   // if (context.payload.repository.name !== "rfcs") {
+  //   //   return;
+  //   // }
+  //
+  //   console.log("push: ", context.payload);
+  //
+  //   if (context.payload.ref === 'refs/heads/main') {
+  //     await webhook.send({
+  //       content: pushToMainTemplate(context.payload),
+  //     });
+  //   }
+  // });
+  //
+  // app.on(["status"], async (context) => {
+  //   // this function handles deploys from circleci, for now it's only for zenith repo
+  //   // if (context.payload.repository.name !== "zenith") {
+  //   //   return;
+  //   // }
+  //   await webhook.send(debugTemplate(context.payload));
+  //
+  //
+  //   // console.log("status: ", context.payload);
+  // })
 
   //
   // we can also:
