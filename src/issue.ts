@@ -216,7 +216,7 @@ export class Issue {
       const [_closed, , issueData] = this.subtasks[i];
 
       // don't update closed subtasks
-      if (_closed || !issueData) {
+      if (_closed || !issueData || issueData.repo !== this.repo_name) {
         continue;
       }
 
