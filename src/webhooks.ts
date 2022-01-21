@@ -16,6 +16,24 @@ export = (app: Probot) => {
     await issue.addToTheProject(context.octokit);
   });
 
+  app.on(["issues.milestoned", "issues.demilestoned"], async (context) => {
+    console.log("issue milestone changed: ", context.payload);
+
+    // github events `issue.milestoned` and `issue.demilestoned` contains
+    // field `payload.milestone`, but for some reason typings doesn't have it
+    // @ts-ignore
+    const prevMilestone = context.payload.milestone;
+
+    let issue = await Issue.load(context.octokit, context.payload.issue.node_id);
+    await issue.syncChildrenMilestone(context.octokit, prevMilestone ? {
+      id: prevMilestone.id,
+      node_id: prevMilestone.node_id,
+      dueOn: prevMilestone.due_on,
+      number: prevMilestone.number,
+      title: prevMilestone.title,
+    } : undefined);
+  });
+
   // app.on("workflow_run", async (context) => {
   //   // this function handles deploys from github actions, for now it's only the console repo
   //   // if (context.payload.repository.name !== 'console') {
