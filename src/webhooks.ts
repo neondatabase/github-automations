@@ -30,6 +30,7 @@ export = (app: Probot) => {
       node_id: prevMilestone.node_id,
       dueOn: prevMilestone.due_on,
       number: prevMilestone.number,
+      title: prevMilestone.title,
     } : undefined);
   });
 

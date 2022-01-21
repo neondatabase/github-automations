@@ -33,6 +33,7 @@ interface Milestone {
   node_id: string;
   dueOn: string;
   number: any;
+  title?: string;
 }
 
 interface IssueData {
@@ -211,12 +212,13 @@ export class Issue {
   }
 
   async syncChildrenMilestone(kit: Octokit, oldMilestone?: Milestone) {
+    const milestoneMap: Record<string, number> = {};
     // sync milestones for children
     for (let i = 0; i < this.subtasks.length; i++) {
       const [_closed, , issueData] = this.subtasks[i];
 
       // don't update closed subtasks
-      if (_closed || !issueData || issueData.repo !== this.repo_name) {
+      if (_closed || !issueData) {
         continue;
       }
 
@@ -228,16 +230,42 @@ export class Issue {
         issue_number,
       });
 
-      // if child issue doesn't have a milestone or matches the parent's old milestone, update it!
-      if (!issue.milestone || issue.milestone.node_id === oldMilestone?.node_id) {
-        let resp = await kit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
-          owner: this.owner_login,
-          repo,
-          issue_number,
-          milestone: this.milestone ? this.milestone.number : null,
-        });
-        console.log("setIssueMilestone: ", resp);
+      if (issue.milestone && issue.milestone.title === oldMilestone?.title) {
+        // we don't want update child's issue milestone if it's milestone doesn't match the parent
+        continue;
       }
+
+      let milestoneNumber = this.milestone ? this.milestone.number : null;
+
+      if (this.milestone && this.milestone.title && repo !== this.repo_name) {
+        if (!milestoneMap[repo]) {
+          let {data: repoMilestones} = await kit.request('GET /repos/{owner}/{repo}/milestones', {
+            owner: this.owner_login,
+            repo,
+          });
+          let milestone = repoMilestones.find((m) => m.title === this.milestone?.title);
+          if (milestone) {
+            milestoneMap[repo] = milestone.number;
+          } else {
+            // we wouldn't be able to update milestone for another repo's issue
+            milestoneMap[repo] = -1;
+            continue;
+          }
+        } else if (milestoneMap[repo] > 0) {
+          milestoneNumber = milestoneMap[repo];
+        } else {
+          continue;
+        }
+      }
+
+      let resp = await kit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
+        owner: this.owner_login,
+        repo,
+        issue_number,
+        milestone: milestoneNumber,
+      });
+
+      console.log("setIssueMilestone: ", resp);
     }
   }
 
@@ -256,6 +284,7 @@ const issueWithParents = `
             id
             dueOn
             number
+            title
           }
           repository {
             nameWithOwner
@@ -278,6 +307,7 @@ const issueWithParents = `
                       id
                       dueOn
                       number
+                      title
                     }
                     repository {
                       nameWithOwner
