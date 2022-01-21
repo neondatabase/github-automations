@@ -1,10 +1,6 @@
 import { Probot } from "probot";
 import { Issue } from "./issue";
-// import {
-//   createWebhook,
-//   debugTemplate,
-//   pushToMainTemplate,
-// } from "./discord_helpers";
+import {webhook, consoleDeployFailedTemplate, consoleDeploySucceedTemplate} from "./discord_helpers";
 
 // webhooks entry point to the probot app
 export = (app: Probot) => {
@@ -34,41 +30,45 @@ export = (app: Probot) => {
     } : undefined);
   });
 
-  // app.on("workflow_run", async (context) => {
-  //   // this function handles deploys from github actions, for now it's only the console repo
-  //   // if (context.payload.repository.name !== 'console') {
-  //   //   return;
-  //   // }
-  //
-  //   await webhook.send(debugTemplate(context.payload));
-  //
-  //   // const workflow_run = context.payload.workflow_run;
-  //   // if (context.payload.action === 'completed' && workflow_run) {
-  //   //   let content = "";
-  //   //   switch (workflow_run.node_id) {
-  //   //     // deploy to staging
-  //   //     case 'WFR_kwLOFWwrAc5mOfYU':
-  //   //       switch (workflow_run.conclusion) {
-  //   //         case "success":
-  //   //           content = deploySucceedTemplate(workflow_run);
-  //   //           break;
-  //   //         case "failure":
-  //   //           content = deployFailedTemplate(workflow_run);
-  //   //           break;
-  //   //       }
-  //   //       break;
-  //   //     default:
-  //   //       break;
-  //   //   }
-  //   //
-  //   //   if (content) {
-  //   //     await webhook.send({
-  //   //       content,
-  //   //     });
-  //   //   }
-  //   // }
-  // });
-  //
+  app.on(["workflow_run"], async (context) => {
+    console.log("workflow_run: ", context.payload);
+
+    const workflow_run = context.payload.workflow_run;
+    if (context.payload.action === 'completed' && workflow_run) {
+      let content = "";
+      switch (workflow_run.node_id) {
+        // deploy to staging
+        case 'WFR_kwLOFWwrAc5nF67q':
+          switch (workflow_run.conclusion) {
+            case "success":
+              content = consoleDeploySucceedTemplate(workflow_run);
+              break;
+            case "failure":
+              content = consoleDeployFailedTemplate(workflow_run);
+              break;
+            case "cancelled":
+              content = `:person_gesturing_no:  Deployment to staging #${workflow_run.run_number} was cancelled.`;
+              break;
+            case "timed_out":
+              content = `:clock10:  Deployment to staging #${workflow_run.run_number} timed out.`;
+              break;
+          }
+          break;
+        default:
+          break;
+      }
+
+      if (content) {
+        await webhook.send({
+          content,
+        });
+      }
+    }
+
+  });
+
+
+
   // app.on(['push'], async (context) => {
   //   // we don't need to deploy our rfcs so just listen to push to main
   //   // if (context.payload.repository.name !== "rfcs") {

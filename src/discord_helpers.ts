@@ -1,15 +1,14 @@
-import Discord from 'discord.js';
 import {bold, codeBlock, hideLinkEmbed} from '@discordjs/builders'
-
+import Discord from "discord.js";
 
 if (!process.env.DISCORD_WEBHOOK_URL) {
-  console.error('DISCORD_WEBHOOK_URL is not set');
-  process.exit(1);
+  console.log("No DISCORD_WEBHOOK_URL found in environment variables. It means no notifications.");
 }
 
 export const webhook = new Discord.WebhookClient({
-  url: process.env.DISCORD_WEBHOOK_URL,
+  url: process.env.DISCORD_WEBHOOK_URL || '',
 });
+
 
 const getShortCommitMessage = (commit: { message: string }) => {
   const parts = commit.message.split('\n');
@@ -18,21 +17,21 @@ const getShortCommitMessage = (commit: { message: string }) => {
 };
 
 const formatCommit = (commit: { message: string, author: {name: string}, id: string }) => {
-  return codeBlock(`${commit.id.substring(0,8)} - ${commit.author.name}: ${getShortCommitMessage(commit)}`);
+  return `${commit.id.substring(0,8)} - ${commit.author.name}: ${getShortCommitMessage(commit)}`;
 };
 
-export const deploySucceedTemplate = (workflow_run: any) => {
-  return `New console version has been successfully deployed on staging\n` +
-      `\n\nHEAD now is:\n` +
-      formatCommit(workflow_run.head_commit);
+export const consoleDeploySucceedTemplate = (workflow_run: any) => {
+  return `:thumbsup:  New console version has been successfully deployed on staging.\n` +
+      `Deploy number: ${workflow_run.run_number}. HEAD now is:\n` +
+      codeBlock(formatCommit(workflow_run.head_commit));
 }
 
-export const deployFailedTemplate = (workflow_run: any) => {
+export const consoleDeployFailedTemplate = (workflow_run: any) => {
   const link = hideLinkEmbed(workflow_run.html_url);
 
-  return `Deploy to stage from ${bold(workflow_run.repository.name + '/' + workflow_run.head_branch)} failed :(\n\n` +
-      formatCommit(workflow_run.head_commit) +
-    `\n\nLogs: ${link}`;
+  return `:no_entry_sign:  Deployment to staging #${workflow_run.run_number} failed :(\n` +
+    `Logs: ${link}\n` +
+    codeBlock(formatCommit(workflow_run.head_commit));
 }
 
 export const pushToMainTemplate = (pushEventData: {
@@ -50,11 +49,7 @@ export const pushToMainTemplate = (pushEventData: {
 }) => {
   const link = hideLinkEmbed(pushEventData.compare);
 
-  return `Push to ${bold(pushEventData.repository.full_name + '/main')}!\n\n` +
-      `${pushEventData.commits.map(formatCommit).join('\n')}` +
-      `\n\nDiff: ${link}`;
-}
-
-export const debugTemplate = (message: any) => {
-  return `Debug info: ${codeBlock(JSON.stringify(message, null, 2))}`;
+  return `Push to ${bold(pushEventData.repository.full_name + '/main')}!\n` +
+      `${codeBlock(pushEventData.commits.map(formatCommit).join('\n'))}` +
+      `\nDiff: ${link}`;
 }
