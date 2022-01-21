@@ -16,6 +16,33 @@ export = (app: Probot) => {
     await issue.addToTheProject(context.octokit);
   });
 
+  app.on(["issues.milestoned", "issues.demilestoned"], async (context) => {
+    console.log("issue milestone changed: ", context.payload);
+
+    // github events `issue.milestoned` and `issue.demilestoned` contains
+    // field `payload.milestone`, but for some reason typings doesn't have it
+    // @ts-ignore
+    const prevMilestone = context.payload.milestone;
+
+    if (context.payload.action === "milestoned" && context.payload.issue.milestone?.node_id === prevMilestone.node_id) {
+      // when milestone is changed to another,
+      // github sends `demilestoned` and `milestoned` events in a row.
+      // so we ignore one of them to avoid double updates on child issues.
+      // We ignore `milestoned` because
+      // it contains the new milestone value as previous one and
+      // we can't check if child issues match the old milestone
+      return;
+    }
+
+    let issue = await Issue.load(context.octokit, context.payload.issue.node_id);
+    await issue.syncChildrenMilestone(context.octokit, prevMilestone ? {
+      id: prevMilestone.id,
+      node_id: prevMilestone.node_id,
+      dueOn: prevMilestone.due_on,
+      number: prevMilestone.number,
+    } : undefined);
+  });
+
   // app.on("workflow_run", async (context) => {
   //   // this function handles deploys from github actions, for now it's only the console repo
   //   // if (context.payload.repository.name !== 'console') {

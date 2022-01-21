@@ -28,6 +28,18 @@ const PROJECT_ID = 'PN_kwDOBKF3Cs1e-g'
 const TRACKED_IN_FIELD_ID = 'MDE2OlByb2plY3ROZXh0RmllbGQ0ODg0OTM='
 const PROGRESS_FIELD_ID = 'MDE2OlByb2plY3ROZXh0RmllbGQ5NzkxMzc='
 
+interface Milestone {
+  id: number;
+  node_id: string;
+  dueOn: string;
+  number: any;
+}
+
+interface IssueData {
+  repo: string;
+  number: number;
+}
+
 export class Issue {
   node_id: string;
   title: string;
@@ -35,7 +47,10 @@ export class Issue {
   closed: boolean;
   number: number;
   repo_full_name: string;
-  subtasks: Array<[boolean, string]>;
+  repo_name: string;
+  subtasks: Array<[boolean, string, IssueData | undefined]>;
+  owner_login: string;
+  milestone?: Milestone;
 
   mentions: Array<Issue>;
   parents: Array<Issue>;
@@ -47,9 +62,13 @@ export class Issue {
     this.closed = node.closed;
     this.number = node.number;
     this.repo_full_name = node.repository.nameWithOwner;
+    this.repo_name = node.repository.name;
     this.subtasks = [];
     this.mentions = [];
     this.parents = [];
+    this.owner_login = node.repository.owner.login;
+    this.milestone = node.milestone;
+
 
     // fill children
     this.setSubtasks();
@@ -77,6 +96,39 @@ export class Issue {
     return issue;
   }
 
+  parseIssueData(title: string): IssueData | undefined {
+    let repo = this.repo_name;
+    let issue_number;
+
+    // 1. #123 style references, when issues in the same repo
+    const matchSameRepoIssue = title.match(/^#(\d+)$/);
+    const matchOrgRepoIssue = (
+      // 2. org/repo#123 style references
+      title.match(new RegExp(`\^${this.owner_login}\/(.*)#(\\d+)$`)) ||
+      // 3. org/repo/issues/123 style references
+      title.match(new RegExp(`\^${this.owner_login}\/(.*)\/issues\/(\\d+)$`)) ||
+      // 4. https://github.com/org/repo/issues/123 style references
+      title.match(new RegExp(`\^https:\/\/github\.com\/${this.owner_login}\/(.*)\/issues\/(\\d+)$`))
+    );
+
+
+    if (matchSameRepoIssue) {
+      issue_number = parseInt(matchSameRepoIssue[1]);
+    } else if (matchOrgRepoIssue) {
+      repo = matchOrgRepoIssue[1]
+      issue_number = parseInt(matchOrgRepoIssue[2]);
+    }
+
+    if (!issue_number) {
+      return
+    }
+
+    return {
+      repo,
+      number: issue_number,
+    }
+  }
+
   // subtasks are markdown list entries in the body
   private setSubtasks() {
     this.subtasks = Array
@@ -84,7 +136,7 @@ export class Issue {
       .map((m: any) => {
         let closed = m[1] === 'x';
         let title = m[2].trim();
-        return [closed, title];
+        return [closed, title, this.parseIssueData(title)];
       });
   }
 
@@ -151,6 +203,42 @@ export class Issue {
       value: this.progress(),
     });
     console.log("setProgressField: ", resp);
+
+    if (this.milestone && this.subtasks.length > 0) {
+      // set milestone field for child issues
+      await this.syncChildrenMilestone(kit, this.milestone);
+    }
+  }
+
+  async syncChildrenMilestone(kit: Octokit, oldMilestone?: Milestone) {
+    // sync milestones for children
+    for (let i = 0; i < this.subtasks.length; i++) {
+      const [_closed, , issueData] = this.subtasks[i];
+
+      // don't update closed subtasks
+      if (_closed || !issueData) {
+        continue;
+      }
+
+      const {repo, number: issue_number} = issueData;
+
+      let {data: issue} = await kit.request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
+        owner: this.owner_login,
+        repo,
+        issue_number,
+      });
+
+      // if child issue doesn't have a milestone or matches the parent's old milestone, update it!
+      if (!issue.milestone || issue.milestone.node_id === oldMilestone?.node_id) {
+        let resp = await kit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
+          owner: this.owner_login,
+          repo,
+          issue_number,
+          milestone: this.milestone ? this.milestone.number : null,
+        });
+        console.log("setIssueMilestone: ", resp);
+      }
+    }
   }
 
 }
@@ -164,8 +252,17 @@ const issueWithParents = `
           title
           body
           number
+          milestone {
+            id
+            dueOn
+            number
+          }
           repository {
             nameWithOwner
+            name
+            owner {
+              login
+            }
           }
           timelineItems(last: 100) {
             nodes {
@@ -177,8 +274,17 @@ const issueWithParents = `
                     title
                     body
                     number
+                    milestone {
+                      id
+                      dueOn
+                      number
+                    }
                     repository {
                       nameWithOwner
+                      name
+                      owner {
+                        login
+                      }
                     }
                   }
                 }
