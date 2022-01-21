@@ -8,6 +8,12 @@ Now it can handle:
 * automatically add new issues to the project
 * update progress when issue is updated
 * update tracked_in when child issue is updated (but not vice versa)
+* update milestone for child issues when parent issue is updated by following rules:
+   - it triggers when parent issue was edited or get a new milestone (empty or not)
+   - id updates milestone only for opened issues
+   - child issue's milestone will be updated if child issue doesn't have a milestone or if it's milestone matches with parent (last edit wins)
+   - for child issues from another repo it tries to find milestone with same name as parent's
+  NB: there might be problems with transferred issues with child issues.
 
 ## Scripts
 
