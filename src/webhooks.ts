@@ -24,16 +24,6 @@ export = (app: Probot) => {
     // @ts-ignore
     const prevMilestone = context.payload.milestone;
 
-    if (context.payload.action === "milestoned" && context.payload.issue.milestone?.node_id === prevMilestone.node_id) {
-      // when milestone is changed to another,
-      // github sends `demilestoned` and `milestoned` events in a row.
-      // so we ignore one of them to avoid double updates on child issues.
-      // We ignore `milestoned` because
-      // it contains the new milestone value as previous one and
-      // we can't check if child issues match the old milestone
-      return;
-    }
-
     let issue = await Issue.load(context.octokit, context.payload.issue.node_id);
     await issue.syncChildrenMilestone(context.octokit, prevMilestone ? {
       id: prevMilestone.id,
