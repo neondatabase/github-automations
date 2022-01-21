@@ -89,4 +89,37 @@ describe("Issue class", () => {
     expect(issue.trackedIn()).toStrictEqual("bot test (https://github.com/org/repo/issues/11), second parent (https://github.com/org/repo/issues/12)");
   });
 
+  test("it parses issue data correctly", () => {
+    const issue = new Issue(rawIssue);
+
+    expect(issue.parseIssueData('#123')).toStrictEqual({
+      number: 123,
+      repo: 'repo'
+    });
+    expect(issue.parseIssueData('org/other_repo#123')).toStrictEqual({
+      number: 123,
+      repo: 'other_repo'
+    });
+    expect(issue.parseIssueData('org/another_repo/issues/123')).toStrictEqual({
+      number: 123,
+      repo: 'another_repo'
+    });
+    expect(issue.parseIssueData('https://github.com/org/another_repo/issues/123')).toStrictEqual({
+      number: 123,
+      repo: 'another_repo'
+    });
+
+    expect(issue.parseIssueData('other_org/another_repo/#123')).toBeUndefined();
+    expect(issue.parseIssueData('https://github.com/other_org/another_repo/123')).toBeUndefined();
+
+    expect(issue.parseIssueData('kind of #123')).toBeUndefined();
+    expect(issue.parseIssueData('kind of another_repo#123')).toBeUndefined();
+    expect(issue.parseIssueData('kind of org/another_repo/123')).toBeUndefined();
+    expect(issue.parseIssueData('kind of https://github.com/org/another_repo/123')).toBeUndefined();
+
+    expect(issue.parseIssueData('#123i')).toBeUndefined();
+    expect(issue.parseIssueData('another_repo#123i')).toBeUndefined();
+    expect(issue.parseIssueData('org/another_repo/123i')).toBeUndefined();
+    expect(issue.parseIssueData('https://github.com/org/another_repo/123i')).toBeUndefined();
+  });
 });
