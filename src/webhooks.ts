@@ -38,7 +38,7 @@ export = (app: Probot) => {
       let content = "";
       switch (workflow_run.node_id) {
         // deploy to staging
-        case 'WFR_kwLOFWwrAc5nF67q':
+        case process.env.CONSOLE_DEPLOY_STAGING_NODE_ID:
           switch (workflow_run.conclusion) {
             case "success":
               content = consoleDeploySucceedTemplate(workflow_run);
