@@ -4,6 +4,8 @@ import {webhook, consoleDeployFailedTemplate, consoleDeploySucceedTemplate} from
 
 // webhooks entry point to the probot app
 export = (app: Probot) => {
+  const CONSOLE_DEPLOY_TO_STAGING_WORKFLOW_ID = parseInt(process.env.CONSOLE_DEPLOY_TO_STAGING_WORKFLOW_ID || '');
+
   app.on(["issues.opened", "issues.edited"], async (context) => {
     console.log("issues.opened: ", context.payload);
 
@@ -36,9 +38,9 @@ export = (app: Probot) => {
     const workflow_run = context.payload.workflow_run;
     if (context.payload.action === 'completed' && workflow_run) {
       let content = "";
-      switch (workflow_run.node_id) {
+      switch (workflow_run.workflow_id) {
         // deploy to staging
-        case process.env.CONSOLE_DEPLOY_STAGING_NODE_ID:
+        case CONSOLE_DEPLOY_TO_STAGING_WORKFLOW_ID:
           switch (workflow_run.conclusion) {
             case "success":
               content = consoleDeploySucceedTemplate(workflow_run);
