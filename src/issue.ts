@@ -217,20 +217,24 @@ export class Issue {
   }
 
   async syncChildrenMilestone(kit: Octokit, oldMilestone: Milestone | null, newMilestone: Milestone | null) {
-    console.log('sync children milestone, from:', oldMilestone);
-    console.log('sync children milestone, to:', newMilestone);
+    if (this.subtasks.length) {
+      console.log('sync children milestone, from:', oldMilestone);
+      console.log('sync children milestone, to:', newMilestone);
+    }
     const milestoneMap: Record<string, number> = {};
     // sync milestones for children
     for (let i = 0; i < this.subtasks.length; i++) {
-      const [_closed, , issueData] = this.subtasks[i];
+      const [_closed, title, issueData] = this.subtasks[i];
 
       // don't update closed subtasks
       if (_closed || !issueData) {
+        console.log(`skip "${title}" because it's closed or couldn't be parsed`);
         continue;
       }
 
       const {repo, number: issue_number} = issueData;
 
+      console.log(`processing ${repo}#${issue_number}`);
       let {data: issue} = await kit.request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
         owner: this.owner_login,
         repo,
@@ -238,15 +242,11 @@ export class Issue {
       });
 
       if (
-        (!issue.milestone && oldMilestone) ||
         (issue.milestone && !oldMilestone) ||
         (issue.milestone && oldMilestone && issue.milestone.title !== oldMilestone.title)
       ) {
-        continue;
-      }
+        console.log(`skip ${repo}#${issue_number} because it didn't match the old milestone: issue milestone: ${issue.milestone?.number}, old milestone: ${oldMilestone?.number}`);
 
-      if (issue.milestone && issue.milestone.title === oldMilestone?.title) {
-        // we don't want update child's issue milestone if it's milestone doesn't match the parent
         continue;
       }
 

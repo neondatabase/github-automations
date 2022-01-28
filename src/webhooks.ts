@@ -1,10 +1,15 @@
 import { Probot } from "probot";
 import { Issue } from "./issue";
 import {webhook, consoleDeployFailedTemplate, consoleDeploySucceedTemplate} from "./discord_helpers";
+import Queue from "async-await-queue";
+
+
 
 // webhooks entry point to the probot app
 export = (app: Probot) => {
   const CONSOLE_DEPLOY_TO_STAGING_WORKFLOW_ID = parseInt(process.env.CONSOLE_DEPLOY_TO_STAGING_WORKFLOW_ID || '');
+  
+  const milestoneQueue = new Queue(1);
 
   // app.on(["issues.opened", "issues.edited"], async (context) => {
   //   console.log("issues.opened: ", context.payload);
@@ -14,38 +19,42 @@ export = (app: Probot) => {
   //   await issue.addToTheProject(context.octokit);
   // });
 
-  app.on(["issues.demilestoned", "issues.milestoned"], async (context) => {
-    console.log("issue milestone changed: ", context.payload);
+  app.on(["issues.demilestoned", "issues.milestoned"], (context) => {
+    // console.log("issue milestone changed: ", context.payload);
+    console.log(`issue ${context.payload.issue.node_id} ${context.payload.action}`);
+    milestoneQueue.run(async () => {
 
-    let prevMilestone = null;
-    let nextMilestone = null;
+      let prevMilestone = null;
+      let nextMilestone = null;
 
-    if (context.payload.action === "demilestoned") {
-      // github events `issue.milestoned` and `issue.demilestoned` contains
-      // field `payload.milestone`, but for some reason typings doesn't have it
-      // @ts-ignore
-      prevMilestone = context.payload.milestone;
-    } else if (context.payload.action === "milestoned") {
-      // @ts-ignore
-      nextMilestone = context.payload.milestone;
-    } else {
-      return;
-    }
+      if (context.payload.action === "demilestoned") {
+        // github events `issue.milestoned` and `issue.demilestoned` contains
+        // field `payload.milestone`, but for some reason typings doesn't have it
+        // @ts-ignore
+        prevMilestone = context.payload.milestone;
+      } else if (context.payload.action === "milestoned") {
+        // @ts-ignore
+        nextMilestone = context.payload.milestone;
+      } else {
+        return;
+      }
 
-    let issue = await Issue.load(context.octokit, context.payload.issue.node_id);
-    await issue.syncChildrenMilestone(context.octokit, prevMilestone ? {
-      id: prevMilestone.id,
-      node_id: prevMilestone.node_id,
-      dueOn: prevMilestone.due_on,
-      number: prevMilestone.number,
-      title: prevMilestone.title,
-    } : null, nextMilestone ? {
-      id: nextMilestone.id,
-      node_id: nextMilestone.node_id,
-      dueOn: nextMilestone.due_on,
-      number: nextMilestone.number,
-      title: nextMilestone.title,
-    } : null);
+      let issue = await Issue.load(context.octokit, context.payload.issue.node_id);
+      await issue.syncChildrenMilestone(context.octokit, prevMilestone ? {
+        id: prevMilestone.id,
+        node_id: prevMilestone.node_id,
+        dueOn: prevMilestone.due_on,
+        number: prevMilestone.number,
+        title: prevMilestone.title,
+      } : null, nextMilestone ? {
+        id: nextMilestone.id,
+        node_id: nextMilestone.node_id,
+        dueOn: nextMilestone.due_on,
+        number: nextMilestone.number,
+        title: nextMilestone.title,
+      } : null);
+    })
+
   });
 
   app.on(["workflow_run"], async (context) => {
