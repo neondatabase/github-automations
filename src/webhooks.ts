@@ -4,21 +4,19 @@ import {webhook, consoleDeployFailedTemplate, consoleDeploySucceedTemplate} from
 import Queue from "async-await-queue";
 import {sleep} from "./utils";
 
-
-
 // webhooks entry point to the probot app
 export = (app: Probot) => {
   const CONSOLE_DEPLOY_TO_STAGING_WORKFLOW_ID = parseInt(process.env.CONSOLE_DEPLOY_TO_STAGING_WORKFLOW_ID || '');
   
   const milestoneQueue = new Queue(1);
 
-  // app.on(["issues.opened", "issues.edited"], async (context) => {
-  //   console.log("issues.opened: ", context.payload);
-  //
-  //   // add issue to project and set few fields
-  //   let issue = await Issue.load(context.octokit, context.payload.issue.node_id);
-  //   await issue.addToTheProject(context.octokit);
-  // });
+  app.on(["issues.opened", "issues.edited"], async (context) => {
+    console.log("issues.opened: ", context.payload);
+
+    // add issue to project and set few fields
+    let issue = await Issue.load(context.octokit, context.payload.issue.node_id);
+    await issue.addToTheProject(context.octokit);
+  });
 
   app.on(["issues.demilestoned", "issues.milestoned"], async (context) => {
     console.log(`issue ${context.payload.issue.node_id} ${context.payload.action}`);
@@ -31,6 +29,7 @@ export = (app: Probot) => {
       // it is a pair of events and milestoned came first
       await sleep(200);
     }
+
     milestoneQueue.run(async () => {
 
       let prevMilestone = null;
