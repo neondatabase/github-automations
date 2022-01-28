@@ -1232,6 +1232,11 @@ assign-symbols@^1.0.0:
   resolved "https://registry.yarnpkg.com/assign-symbols/-/assign-symbols-1.0.0.tgz#59667f41fadd4f20ccbc2bb96b8d4f7f78ec0367"
   integrity sha1-WWZ/QfrdTyDMvCu5a41Pf3jsA2c=
 
+async-await-queue@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/async-await-queue/-/async-await-queue-1.2.0.tgz#bd71eef4ada7b63a5c13bcb72f5c01a2575d2d02"
+  integrity sha512-Biup5C0vGEnfzzK+ufXvYan2/YK5lga+B5xj/IGmED82MLbUOI8VUB4BZ9JW9qLLB4HU/p7Ca29epJDNTEMEhg==
+
 asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
