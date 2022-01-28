@@ -1,5 +1,6 @@
 import { Octokit } from "@octokit/core";
 import type { GraphQlQueryResponseData } from "@octokit/graphql";
+import {isDryRun} from "./utils";
 
 // gh api graphql -f query='
 //   query {
@@ -93,7 +94,7 @@ export class Issue {
       issue_id: issueNodeId,
     });
     let issue = new Issue(resp.node);
-    console.log("new ZenithIssue object: ", issue);
+    // console.log("new ZenithIssue object: ", issue);
     return issue;
   }
 
@@ -188,30 +189,36 @@ export class Issue {
     let project_item_id: string = resp.addProjectNextItem.projectNextItem.id
 
     // set tracked_in field
-    resp = await kit.graphql(setField, {
-      project_id: PROJECT_ID,
-      project_item_id: project_item_id,
-      tracked_field_id: TRACKED_IN_FIELD_ID,
-      value: this.trackedIn(),
-    });
+    if (!isDryRun()) {
+      resp = await kit.graphql(setField, {
+        project_id: PROJECT_ID,
+        project_item_id: project_item_id,
+        tracked_field_id: TRACKED_IN_FIELD_ID,
+        value: this.trackedIn(),
+      });
+    }
     console.log("setTrackedIn: ", resp);
 
     // set progress field
-    resp = await kit.graphql(setField, {
-      project_id: PROJECT_ID,
-      project_item_id: project_item_id,
-      tracked_field_id: PROGRESS_FIELD_ID,
-      value: this.progress(),
-    });
+    if (!isDryRun()) {
+      resp = await kit.graphql(setField, {
+        project_id: PROJECT_ID,
+        project_item_id: project_item_id,
+        tracked_field_id: PROGRESS_FIELD_ID,
+        value: this.progress(),
+      });
+    }
     console.log("setProgressField: ", resp);
 
     if (this.milestone && this.subtasks.length > 0) {
       // set milestone field for child issues
-      await this.syncChildrenMilestone(kit, this.milestone);
+      await this.syncChildrenMilestone(kit, this.milestone, this.milestone);
     }
   }
 
-  async syncChildrenMilestone(kit: Octokit, oldMilestone?: Milestone) {
+  async syncChildrenMilestone(kit: Octokit, oldMilestone: Milestone | null, newMilestone: Milestone | null) {
+    console.log('sync children milestone, from:', oldMilestone);
+    console.log('sync children milestone, to:', newMilestone);
     const milestoneMap: Record<string, number> = {};
     // sync milestones for children
     for (let i = 0; i < this.subtasks.length; i++) {
@@ -230,20 +237,28 @@ export class Issue {
         issue_number,
       });
 
+      if (
+        (!issue.milestone && oldMilestone) ||
+        (issue.milestone && !oldMilestone) ||
+        (issue.milestone && oldMilestone && issue.milestone.title !== oldMilestone.title)
+      ) {
+        continue;
+      }
+
       if (issue.milestone && issue.milestone.title === oldMilestone?.title) {
         // we don't want update child's issue milestone if it's milestone doesn't match the parent
         continue;
       }
 
-      let milestoneNumber = this.milestone ? this.milestone.number : null;
+      let milestoneNumber = newMilestone ? newMilestone.number : null;
 
-      if (this.milestone && this.milestone.title && repo !== this.repo_name) {
+      if (newMilestone && newMilestone.title && repo !== this.repo_name) {
         if (!milestoneMap[repo]) {
           let {data: repoMilestones} = await kit.request('GET /repos/{owner}/{repo}/milestones', {
             owner: this.owner_login,
             repo,
           });
-          let milestone = repoMilestones.find((m) => m.title === this.milestone?.title);
+          let milestone = repoMilestones.find((m) => m.title === newMilestone?.title);
           if (milestone) {
             milestoneMap[repo] = milestone.number;
           } else {
@@ -258,14 +273,16 @@ export class Issue {
         }
       }
 
-      let resp = await kit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
-        owner: this.owner_login,
-        repo,
-        issue_number,
-        milestone: milestoneNumber,
-      });
+      if (!isDryRun()) {
+        await kit.request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
+          owner: this.owner_login,
+          repo,
+          issue_number,
+          milestone: milestoneNumber,
+        });
+      }
 
-      console.log("setIssueMilestone: ", resp);
+      console.log(`set issue #${repo}/${issue_number} milestone to`, milestoneNumber);
     }
   }
 

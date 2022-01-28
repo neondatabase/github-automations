@@ -6,21 +6,31 @@ import {webhook, consoleDeployFailedTemplate, consoleDeploySucceedTemplate} from
 export = (app: Probot) => {
   const CONSOLE_DEPLOY_TO_STAGING_WORKFLOW_ID = parseInt(process.env.CONSOLE_DEPLOY_TO_STAGING_WORKFLOW_ID || '');
 
-  app.on(["issues.opened", "issues.edited"], async (context) => {
-    console.log("issues.opened: ", context.payload);
+  // app.on(["issues.opened", "issues.edited"], async (context) => {
+  //   console.log("issues.opened: ", context.payload);
+  //
+  //   // add issue to project and set few fields
+  //   let issue = await Issue.load(context.octokit, context.payload.issue.node_id);
+  //   await issue.addToTheProject(context.octokit);
+  // });
 
-    // add issue to project and set few fields
-    let issue = await Issue.load(context.octokit, context.payload.issue.node_id);
-    await issue.addToTheProject(context.octokit);
-  });
-
-  app.on(["issues.milestoned", "issues.demilestoned"], async (context) => {
+  app.on(["issues.demilestoned", "issues.milestoned"], async (context) => {
     console.log("issue milestone changed: ", context.payload);
 
-    // github events `issue.milestoned` and `issue.demilestoned` contains
-    // field `payload.milestone`, but for some reason typings doesn't have it
-    // @ts-ignore
-    const prevMilestone = context.payload.milestone;
+    let prevMilestone = null;
+    let nextMilestone = null;
+
+    if (context.payload.action === "demilestoned") {
+      // github events `issue.milestoned` and `issue.demilestoned` contains
+      // field `payload.milestone`, but for some reason typings doesn't have it
+      // @ts-ignore
+      prevMilestone = context.payload.milestone;
+    } else if (context.payload.action === "milestoned") {
+      // @ts-ignore
+      nextMilestone = context.payload.milestone;
+    } else {
+      return;
+    }
 
     let issue = await Issue.load(context.octokit, context.payload.issue.node_id);
     await issue.syncChildrenMilestone(context.octokit, prevMilestone ? {
@@ -29,7 +39,13 @@ export = (app: Probot) => {
       dueOn: prevMilestone.due_on,
       number: prevMilestone.number,
       title: prevMilestone.title,
-    } : undefined);
+    } : null, nextMilestone ? {
+      id: nextMilestone.id,
+      node_id: nextMilestone.node_id,
+      dueOn: nextMilestone.due_on,
+      number: nextMilestone.number,
+      title: nextMilestone.title,
+    } : null);
   });
 
   app.on(["workflow_run"], async (context) => {
