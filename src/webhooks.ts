@@ -2,6 +2,7 @@ import { Probot } from "probot";
 import { Issue } from "./issue";
 import {webhook, consoleDeployFailedTemplate, consoleDeploySucceedTemplate} from "./discord_helpers";
 import Queue from "async-await-queue";
+import {sleep} from "./utils";
 
 
 
@@ -19,9 +20,17 @@ export = (app: Probot) => {
   //   await issue.addToTheProject(context.octokit);
   // });
 
-  app.on(["issues.demilestoned", "issues.milestoned"], (context) => {
-    // console.log("issue milestone changed: ", context.payload);
+  app.on(["issues.demilestoned", "issues.milestoned"], async (context) => {
     console.log(`issue ${context.payload.issue.node_id} ${context.payload.action}`);
+
+    // sometimese github would send event in wrong order
+    // so we always process demilestoned beforeс milestoned
+    // to avoid bugs when milestone is changed from one to another
+    if (context.payload.action === 'milestoned') {
+      // we wait before add the task to queue in case
+      // it is a pair of events and milestoned came first
+      await sleep(200);
+    }
     milestoneQueue.run(async () => {
 
       let prevMilestone = null;
@@ -53,8 +62,7 @@ export = (app: Probot) => {
         number: nextMilestone.number,
         title: nextMilestone.title,
       } : null);
-    })
-
+    });
   });
 
   app.on(["workflow_run"], async (context) => {
