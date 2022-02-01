@@ -94,7 +94,7 @@ export class Issue {
       issue_id: issueNodeId,
     });
     let issue = new Issue(resp.node);
-    // console.log("new ZenithIssue object: ", issue);
+    console.log("new ZenithIssue object: ", issue);
     return issue;
   }
 
@@ -190,6 +190,7 @@ export class Issue {
 
     // set tracked_in field
     if (!isDryRun()) {
+      console.log("set tracked in for", this.title);
       resp = await kit.graphql(setField, {
         project_id: PROJECT_ID,
         project_item_id: project_item_id,
@@ -213,6 +214,34 @@ export class Issue {
     if (this.milestone && this.subtasks.length > 0) {
       // set milestone field for child issues
       await this.syncChildrenMilestone(kit, this.milestone, this.milestone);
+    }
+  }
+
+  async addChildrenToTheProject(kit: Octokit) {
+    console.log(`syncChildrenTrackedIn: ${this.title}`);
+    if (!this.subtasks.length) {
+      console.log(`skip because no subtasks`);
+      return;
+    }
+
+
+    for (let [closed, , issueData] of this.subtasks) {
+      if (closed || !issueData) {
+        continue;
+      }
+
+      console.log(`processing ${issueData.repo}#${issueData.number}`);
+      let {data: issue} = await kit.request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
+        owner: this.owner_login,
+        repo: issueData.repo,
+        issue_number: issueData.number,
+      });
+
+      console.log(`process ${issue}`);
+
+      const zIssue = await Issue.load(kit, issue.node_id);
+      await zIssue.addToTheProject(kit);
+      console.log(`done processing ${issue.title}`);
     }
   }
 

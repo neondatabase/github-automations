@@ -16,6 +16,7 @@ export = (app: Probot) => {
     // add issue to project and set few fields
     let issue = await Issue.load(context.octokit, context.payload.issue.node_id);
     await issue.addToTheProject(context.octokit);
+    await issue.addChildrenToTheProject(context.octokit)
   });
 
   app.on(["issues.demilestoned", "issues.milestoned"], async (context) => {
