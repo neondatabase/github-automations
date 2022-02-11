@@ -20,8 +20,18 @@ const formatCommit = (commit: { message: string, author: {name: string}, id: str
   return `${commit.id.substring(0,8)} - ${commit.author.name}: ${getShortCommitMessage(commit)}`;
 };
 
+export const getDeploymentEnv = (workflow_run: any) => {
+  if (workflow_run.workflow_id == process.env.CONSOLE_DEPLOY_TO_STAGING_WORKFLOW_ID) {
+    return "**[ STAGING ]**\n";
+  }
+  if (workflow_run.workflow_id == process.env.CONSOLE_DEPLOY_TO_PRODUCTION_WORKFLOW_ID) {
+    return "**[ PRODUCTION ]**\n";
+  }
+  throw new Error("Unknown deployment workflow run id");
+}
+
 export const consoleDeploySucceedTemplate = (workflow_run: any) => {
-  return `:thumbsup:  New console version has been successfully deployed on staging.\n` +
+  return `:thumbsup:  ${getDeploymentEnv(workflow_run)} New console version has been successfully deployed.\n` +
       `Deploy number: ${workflow_run.run_number}. HEAD now is:\n` +
       codeBlock(formatCommit(workflow_run.head_commit));
 }
@@ -29,7 +39,7 @@ export const consoleDeploySucceedTemplate = (workflow_run: any) => {
 export const consoleDeployFailedTemplate = (workflow_run: any) => {
   const link = hideLinkEmbed(workflow_run.html_url);
 
-  return `:no_entry_sign:  Deployment to staging #${workflow_run.run_number} failed :(\n` +
+  return `:no_entry_sign:  ${getDeploymentEnv(workflow_run)} Deployment #${workflow_run.run_number} failed :(\n` +
     `Logs: ${link}\n` +
     codeBlock(formatCommit(workflow_run.head_commit));
 }
