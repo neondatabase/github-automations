@@ -1,6 +1,12 @@
 import { Probot } from "probot";
 import { Issue } from "./issue";
-import {webhook, consoleDeployFailedTemplate, consoleDeploySucceedTemplate, getDeploymentEnv} from "./discord_helpers";
+import {
+  webhook,
+  consoleDeployFailedTemplate,
+  consoleDeploySucceedTemplate,
+  consoleDeployTimedOutTemplate,
+  consoleDeployCancelledTemplate,
+} from "./discord_helpers";
 import Queue from "async-await-queue";
 import {sleep} from "./utils";
 
@@ -71,23 +77,23 @@ export = (app: Probot) => {
 
     const workflow_run = context.payload.workflow_run;
     if (context.payload.action === 'completed' && workflow_run) {
-      let content = "";
+      let msg;
       switch (workflow_run.workflow_id) {
         // deploy to staging
         case CONSOLE_DEPLOY_TO_STAGING_WORKFLOW_ID:
         case CONSOLE_DEPLOY_TO_PRODUCTION_WORKFLOW_ID:
           switch (workflow_run.conclusion) {
             case "success":
-              content = consoleDeploySucceedTemplate(workflow_run);
+              msg = consoleDeploySucceedTemplate(workflow_run);
               break;
             case "failure":
-              content = consoleDeployFailedTemplate(workflow_run);
+              msg = consoleDeployFailedTemplate(workflow_run);
               break;
             case "cancelled":
-              content = `:person_gesturing_no:  ${getDeploymentEnv(workflow_run)} Deployment #${workflow_run.run_number} was cancelled.`;
+              msg = consoleDeployCancelledTemplate(workflow_run);
               break;
             case "timed_out":
-              content = `:clock10:  ${getDeploymentEnv(workflow_run)} Deployment #${workflow_run.run_number} timed out.`;
+              msg = consoleDeployTimedOutTemplate(workflow_run);
               break;
           }
           break;
@@ -95,10 +101,8 @@ export = (app: Probot) => {
           break;
       }
 
-      if (content) {
-        await webhook.send({
-          content,
-        });
+      if (msg) {
+        await webhook.send(msg);
       }
     }
 
