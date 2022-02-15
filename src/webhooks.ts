@@ -6,6 +6,7 @@ import {
   consoleDeploySucceedTemplate,
   consoleDeployTimedOutTemplate,
   consoleDeployCancelledTemplate,
+  getZenithDeploymentTemplate,
 } from "./discord_helpers";
 import Queue from "async-await-queue";
 import {sleep} from "./utils";
@@ -125,16 +126,45 @@ export = (app: Probot) => {
   //   }
   // });
   //
-  // app.on(["status"], async (context) => {
-  //   // this function handles deploys from circleci, for now it's only for zenith repo
-  //   // if (context.payload.repository.name !== "zenith") {
-  //   //   return;
-  //   // }
-  //   await webhook.send(debugTemplate(context.payload));
-  //
-  //
-  //   // console.log("status: ", context.payload);
-  // })
+  app.on(["status"], async (context) => {
+    // console.log("received status event", context.payload);
+    // first we check it's zenithdb/zenith repo and main branch
+    if (context.payload.repository.name !== "zenith"
+      || !context.payload.branches.find((b) => b.name === "main"
+      || context.payload.state === 'pending')) {
+      return;
+    }
+
+    const match = context.payload.context.match(/^ci\/circleci:\s(.*)$/);
+    if (!match) {
+      return;
+    }
+    const jobName = match[1];
+
+    // we can fetch some data from CircleCI API
+    // const circleCiMatch = (context.payload.target_url || '').match(/^https:\/\/circleci\.com\/(.*)\/(\d+)/);
+    // if (!circleCiMatch) {
+    //   return;
+    // }
+    // const [, slug, jobId] = circleCiMatch;
+
+    // const {data: jobData} = await CircleCIClient.get(`/project/${slug}/job/${jobId}`);
+
+    const template = getZenithDeploymentTemplate({
+      jobName,
+      payload: context.payload,
+    });
+
+    if (!template) {
+      return;
+    }
+
+    try {
+      await webhook.send(template)
+    } catch(e) {
+      console.log(e)
+    }
+  })
 
   //
   // we can also:

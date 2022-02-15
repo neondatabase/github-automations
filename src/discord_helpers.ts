@@ -1,5 +1,6 @@
 import {bold, codeBlock, hideLinkEmbed} from '@discordjs/builders'
 import Discord, {MessageEmbed} from "discord.js";
+import {CirceCiJobs} from "./circleci";
 
 if (!process.env.DISCORD_WEBHOOK_URL) {
   console.log("No DISCORD_WEBHOOK_URL found in environment variables. It means no notifications.");
@@ -10,6 +11,13 @@ export const webhook = new Discord.WebhookClient({
 });
 
 const COMMIT_MESSAGE_LIMIT = 1600;
+
+enum ResultIcons {
+  Success = ":thumbsup:",
+  Failed = ":no_entry_sign:",
+  Cancelled = ":person_gesturing_no:",
+  TimedOut = ":clock10:",
+}
 
 const getShortCommitMessage = (commit: { message: string }) => {
   return commit.message.length > COMMIT_MESSAGE_LIMIT ? commit.message.substring(0, COMMIT_MESSAGE_LIMIT) + '...' : commit.message;
@@ -43,10 +51,10 @@ const getCommitEmbeds = (
 
 export const getDeploymentEnv = (workflow_run: any) => {
   if (workflow_run.workflow_id == process.env.CONSOLE_DEPLOY_TO_STAGING_WORKFLOW_ID) {
-    return "**[ STAGING ]**";
+    return "**[ STAGING CONSOLE ]**";
   }
   if (workflow_run.workflow_id == process.env.CONSOLE_DEPLOY_TO_PRODUCTION_WORKFLOW_ID) {
-    return "**[ PRODUCTION ]**";
+    return "**[ PRODUCTION CONSOLE ]**";
   }
   throw new Error("Unknown deployment workflow run id");
 }
@@ -54,7 +62,7 @@ export const getDeploymentEnv = (workflow_run: any) => {
 export const consoleDeploySucceedTemplate = (workflow_run: any) => {
   return {
     ...getCommitEmbeds(workflow_run),
-    content: `:thumbsup:  ${getDeploymentEnv(workflow_run)} New console version has been successfully deployed.\n` +
+    content: `${ResultIcons.Success}  ${getDeploymentEnv(workflow_run)} New console version has been successfully deployed.\n` +
       `Deploy number: ${workflow_run.run_number}. HEAD now is:\n`,
   }
 }
@@ -64,7 +72,7 @@ export const consoleDeployFailedTemplate = (workflow_run: any) => {
 
   return {
     ...getCommitEmbeds(workflow_run),
-    content: `:no_entry_sign:  ${getDeploymentEnv(workflow_run)} Deployment #${workflow_run.run_number} failed :(\n` +
+    content: `${ResultIcons.Failed}  ${getDeploymentEnv(workflow_run)} Deployment #${workflow_run.run_number} failed :(\n` +
     `Logs: ${link}\n`,
   }
 }
@@ -72,14 +80,14 @@ export const consoleDeployFailedTemplate = (workflow_run: any) => {
 export const consoleDeployTimedOutTemplate = (workflow_run: any) => {
   return {
     ...getCommitEmbeds(workflow_run),
-    content: `:clock10:  ${getDeploymentEnv(workflow_run)} Deployment #${workflow_run.run_number} timed out.`,
+    content: `${ResultIcons.TimedOut}  ${getDeploymentEnv(workflow_run)} Deployment #${workflow_run.run_number} timed out.`,
   }
 }
 
 export const consoleDeployCancelledTemplate = (workflow_run: any) => {
   return {
     ...getCommitEmbeds(workflow_run),
-    content: `:person_gesturing_no:  ${getDeploymentEnv(workflow_run)} Deployment #${workflow_run.run_number} was cancelled.`,
+    content: `${ResultIcons.Cancelled}  ${getDeploymentEnv(workflow_run)} Deployment #${workflow_run.run_number} was cancelled.`,
   }
 }
 
@@ -101,4 +109,60 @@ export const pushToMainTemplate = (pushEventData: {
   return `Push to ${bold(pushEventData.repository.full_name + '/main')}!\n` +
       `${codeBlock(pushEventData.commits.map(formatCommit).join('\n'))}` +
       `\nDiff: ${link}`;
+}
+
+export const getZenithEnv = (jobName: CirceCiJobs) => {
+  switch (jobName) {
+    case CirceCiJobs.DeployProxyProduction:
+      return "**[ PRODUCTION PROXY ]**";
+    case CirceCiJobs.DeployProxyStaging:
+      return "**[ STAGING PROXY ]**";
+    case CirceCiJobs.DeployStaging:
+      return "**[ STAGING ZENITH ]**";
+    case CirceCiJobs.DeployProduction:
+      return "**[ PRODUCTION ZENITH ]**";
+  }
+
+  throw new Error("Unknown job name");
+}
+
+export const getZenithDeploymentTemplate = ({
+  jobName,
+  payload
+}: {
+  jobName: string,
+  payload: any,
+}) => {
+  if (!Object.values(CirceCiJobs).includes(jobName as CirceCiJobs) || !payload.target_url) {
+    return
+  }
+
+  let icon;
+  switch (payload.state) {
+    case 'success':
+      icon = ResultIcons.Success;
+      break;
+    case 'failure':
+    case 'error':
+      icon = ResultIcons.Failed;
+      break;
+  }
+  let embeds = {};
+  try {
+    embeds = getCommitEmbeds({
+      head_commit: {
+        ...payload.commit.commit,
+        id: payload.commit.sha,
+      },
+      repository: payload.repository
+    })
+  } catch(e) {
+    console.log(e);
+  }
+  return {
+    content: `${icon} ${getZenithEnv(jobName as CirceCiJobs)} Job **${jobName}** completed with status \`${payload.state}\`\n` +
+      `Job details: ${hideLinkEmbed(payload.target_url)}\n` +
+      `Commit details:\n`,
+    ...embeds,
+  }
 }
