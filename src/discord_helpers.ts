@@ -24,16 +24,16 @@ const getCommitEmbeds = (
 ) => {
   const {head_commit: commit, repository: repo} = workflow_run;
 
-  const [title, ...changes] = commit.message.split('\n');
-  let changesStr = changes.join('\n');
-  if (changesStr.length > COMMIT_MESSAGE_LIMIT) {
-    changesStr = changesStr.substring(0, COMMIT_MESSAGE_LIMIT) + '...';
-  }
+  const [title, ...changes] = (
+    commit.message.length > COMMIT_MESSAGE_LIMIT ?
+      commit.message.substring(0, COMMIT_MESSAGE_LIMIT) + '...' :
+      commit.message
+  ).split('\n');
 
   const commitEmbed = new MessageEmbed()
     .setAuthor({name: `${commit.author.name} <${commit.author.email}>`})
     .setTitle(`${commit.id.substring(0, 8)} - ${title}`)
-    .setDescription(changesStr)
+    .setDescription(changes.join('\n'))
     .setURL(`https://github.com/${repo.full_name}/commit/${commit.id}`);
 
   return {
