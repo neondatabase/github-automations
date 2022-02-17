@@ -130,8 +130,8 @@ export = (app: Probot) => {
     // console.log("received status event", context.payload);
     // first we check it's zenithdb/zenith repo and main branch
     if (context.payload.repository.name !== "zenith"
-      || !context.payload.branches.find((b) => b.name === "main"
-      || context.payload.state === 'pending')) {
+      || !context.payload.branches.find((b) => b.name === "main")
+      || context.payload.state === 'pending') {
       return;
     }
 
