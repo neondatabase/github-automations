@@ -50,10 +50,10 @@ const getCommitEmbeds = (
 }
 
 export const getDeploymentEnv = (workflow_run: any) => {
-  if (workflow_run.workflow_id == process.env.CONSOLE_DEPLOY_TO_STAGING_WORKFLOW_ID) {
+  if (workflow_run.head_branch == process.env.CONSOLE_STAGING_BRANCH_NAME) {
     return "**[ STAGING CONSOLE ]**";
   }
-  if (workflow_run.workflow_id == process.env.CONSOLE_DEPLOY_TO_PRODUCTION_WORKFLOW_ID) {
+  if (workflow_run.head_branch == process.env.CONSOLE_PRODUCTION_BRANCH_NAME) {
     return "**[ PRODUCTION CONSOLE ]**";
   }
   throw new Error("Unknown deployment workflow run id");

@@ -13,8 +13,7 @@ import {sleep} from "./utils";
 
 // webhooks entry point to the probot app
 export = (app: Probot) => {
-  const CONSOLE_DEPLOY_TO_STAGING_WORKFLOW_ID = parseInt(process.env.CONSOLE_DEPLOY_TO_STAGING_WORKFLOW_ID || '');
-  const CONSOLE_DEPLOY_TO_PRODUCTION_WORKFLOW_ID = parseInt(process.env.CONSOLE_DEPLOY_TO_PRODUCTION_WORKFLOW_ID || '');
+  const CONSOLE_DEPLOY_WORKFLOW_ID = parseInt(process.env.CONSOLE_DEPLOY_WORKFLOW_ID || '');
 
   const milestoneQueue = new Queue(1);
 
@@ -81,8 +80,7 @@ export = (app: Probot) => {
       let msg;
       switch (workflow_run.workflow_id) {
         // deploy to staging
-        case CONSOLE_DEPLOY_TO_STAGING_WORKFLOW_ID:
-        case CONSOLE_DEPLOY_TO_PRODUCTION_WORKFLOW_ID:
+        case CONSOLE_DEPLOY_WORKFLOW_ID:
           switch (workflow_run.conclusion) {
             case "success":
               msg = consoleDeploySucceedTemplate(workflow_run);
