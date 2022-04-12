@@ -15,6 +15,8 @@ Now it can handle:
    - for child issues from another repo it tries to find milestone with same name as parent's
   NB: there might be problems with transferred issues with child issues.
 
+The bot is also responsible for deploy notifications, so make sure to configure it correctly.
+
 ## Scripts
 
 `./sync_issues.rb` -- walks over all open issues in console and zeniths repos and add them to https://github.com/orgs/zenithdb/projects/6. Also sets `Tracked In` field if current issue is subtask of some other issue.

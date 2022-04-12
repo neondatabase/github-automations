@@ -1,13 +1,13 @@
 import { Probot } from "probot";
 import { Issue } from "./issue";
 import {
-  webhook,
   consoleDeployFailedTemplate,
   consoleDeploySucceedTemplate,
   consoleDeployTimedOutTemplate,
   consoleDeployCancelledTemplate,
-  getZenithDeploymentTemplate,
-} from "./discord_helpers";
+  getDeploymentTemplate,
+  sendDeployNotification,
+} from "./notification_helpers";
 import Queue from "async-await-queue";
 import {sleep} from "./utils";
 
@@ -101,7 +101,7 @@ export = (app: Probot) => {
       }
 
       if (msg) {
-        await webhook.send(msg);
+        await sendDeployNotification(msg);
       }
     }
 
@@ -126,8 +126,8 @@ export = (app: Probot) => {
   //
   app.on(["status"], async (context) => {
     // console.log("received status event", context.payload);
-    // first we check it's zenithdb/zenith repo and main branch
-    if (context.payload.repository.name !== "zenith"
+    // first we check it's neondatabase/neon repo and main branch
+    if (context.payload.repository.name !== "neon"
       || !context.payload.branches.find((b) => b.name === "main")
       || context.payload.state === 'pending') {
       return;
@@ -148,7 +148,7 @@ export = (app: Probot) => {
 
     // const {data: jobData} = await CircleCIClient.get(`/project/${slug}/job/${jobId}`);
 
-    const template = getZenithDeploymentTemplate({
+    const template = getDeploymentTemplate({
       jobName,
       payload: context.payload,
     });
@@ -158,7 +158,7 @@ export = (app: Probot) => {
     }
 
     try {
-      await webhook.send(template)
+      await sendDeployNotification(template)
     } catch(e) {
       console.log(e)
     }
