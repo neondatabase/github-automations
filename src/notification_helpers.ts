@@ -8,10 +8,11 @@ const slackClient = new WebClient(process.env.SLACK_TOKEN || '');
 
 export const sendDeployNotification = async (data: MessageContent) => {
   try {
-    await slackClient.chat.postMessage({
+    const result = await slackClient.chat.postMessage({
       ...data,
       channel: process.env.SLACK_DEPLOY_NOTIFICATIONS_CHANNEL || '',
     });
+    console.log('Chat message request completed:', result);
   } catch (e) {
     console.log("failed to send notification message")
     console.error(e);
