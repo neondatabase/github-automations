@@ -76,7 +76,7 @@ export = (app: Probot) => {
   app.on(["workflow_run"], async (context) => {
     const workflow_run = context.payload.workflow_run;
 
-    if (context.payload.action === 'completed' && workflow_run) {
+    if (context.payload.action === 'completed' && context.payload.sender.login !== 'vipvap' && workflow_run) {
       notificationsQueue.run(async () => {
       console.log("workflow_run: ", context.id);
       console.log(context.payload)
