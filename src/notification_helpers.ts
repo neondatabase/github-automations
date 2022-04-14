@@ -1,14 +1,21 @@
-import {bold, codeBlock, hideLinkEmbed} from '@discordjs/builders'
 import {CirceCiJobs} from "./circleci";
-import {Block,KnownBlock, WebClient} from "@slack/web-api";
+import {Block, ChatPostMessageArguments, KnownBlock, WebClient} from "@slack/web-api";
+
+export type MessageContent = Omit<ChatPostMessageArguments, 'channel'>;
+type TemplateFunc = (args: any) => MessageContent | undefined;
 
 const slackClient = new WebClient(process.env.SLACK_TOKEN || '');
-export const sendDeployNotification = async (blocks?: (Block|KnownBlock)[]) => {
-  await slackClient.chat.postMessage({
-    channel: process.env.SLACK_DEPLOY_NOTIFICATIONS_CHANNEL || '',
-    text: '',
-    blocks,
-  });
+
+export const sendDeployNotification = async (data: MessageContent) => {
+  try {
+    await slackClient.chat.postMessage({
+      ...data,
+      channel: process.env.SLACK_DEPLOY_NOTIFICATIONS_CHANNEL || '',
+    });
+  } catch (e) {
+    console.log("failed to send notification message")
+    console.error(e);
+  }
 }
 
 const COMMIT_MESSAGE_LIMIT = 1600;
@@ -20,13 +27,13 @@ enum ResultIcons {
   TimedOut = ":clock10:",
 }
 
-const getShortCommitMessage = (commit: { message: string }) => {
-  return commit.message.length > COMMIT_MESSAGE_LIMIT ? commit.message.substring(0, COMMIT_MESSAGE_LIMIT) + '...' : commit.message;
-};
+// const getShortCommitMessage = (commit: { message: string }) => {
+//   return commit.message.length > COMMIT_MESSAGE_LIMIT ? commit.message.substring(0, COMMIT_MESSAGE_LIMIT) + '...' : commit.message;
+// };
 
-const formatCommit = (commit: { message: string, author: {name: string}, id: string }) => {
-  return `${commit.id.substring(0,8)} - ${commit.author.name}:\n\n${getShortCommitMessage(commit)}`;
-};
+// const formatCommit = (commit: { message: string, author: {name: string}, id: string }) => {
+//   return `${commit.id.substring(0,8)} - ${commit.author.name}:\n\n${getShortCommitMessage(commit)}`;
+// };
 
 const getCommitEmbeds: (w: any) => Block|KnownBlock = (
   workflow_run: any
@@ -62,80 +69,79 @@ export const getDeploymentEnv = (workflow_run: any) => {
   throw new Error("Unknown deployment workflow run id");
 }
 
-export const consoleDeploySucceedTemplate = (workflow_run: any) => {
-  return [
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `${ResultIcons.Success}  ${getDeploymentEnv(workflow_run)} New console version has been successfully deployed.\n` +
-          `Deploy number: ${workflow_run.run_number}.\n` +
-          `HEAD now is: \n`,
-      }
-    },
-    getCommitEmbeds(workflow_run),
-  ];
+export const consoleDeploySucceedTemplate: TemplateFunc = (workflow_run: any) => {
+  const header = "New console version has been successfully deployed."
+
+  return {
+    text: header,
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `${ResultIcons.Success}  ${getDeploymentEnv(workflow_run)} ${header}\n` +
+            `Deploy number: ${workflow_run.run_number}.\n` +
+            `HEAD now is: \n`,
+        }
+      },
+      getCommitEmbeds(workflow_run),
+    ]
+  };
 }
 
-export const consoleDeployFailedTemplate = (workflow_run: any) => {
-  return [
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `${ResultIcons.Failed}  ${getDeploymentEnv(workflow_run)} Deployment #${workflow_run.run_number} failed :(\n` +
-          `Logs: <${workflow_run.html_url}|view on github>\n` +
-          `Commit details:`,
-      }
-    },
-    getCommitEmbeds(workflow_run),
-  ];
+export const consoleDeployFailedTemplate: TemplateFunc = (workflow_run: any) => {
+  const header = `Deployment #${workflow_run.run_number} failed`
+
+  return {
+    text: header,
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `${ResultIcons.Failed}  ${getDeploymentEnv(workflow_run)} ${header} :(\n` +
+            `Logs: <${workflow_run.html_url}|view on github>\n` +
+            `Commit details:`,
+        }
+      },
+      getCommitEmbeds(workflow_run),
+    ]
+  };
 }
 
-export const consoleDeployTimedOutTemplate = (workflow_run: any) => {
-  return [
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `${ResultIcons.TimedOut}  ${getDeploymentEnv(workflow_run)} Deployment #${workflow_run.run_number} timed out.`,
-      }
-    },
-    getCommitEmbeds(workflow_run),
-  ];
+export const consoleDeployTimedOutTemplate: TemplateFunc = (workflow_run: any) => {
+  const header = `Deployment #${workflow_run.run_number} timed out.`;
+  return {
+    text: header,
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `${ResultIcons.TimedOut}  ${getDeploymentEnv(workflow_run)} ${header}`,
+        }
+      },
+      getCommitEmbeds(workflow_run),
+   ]
+  };
 }
 
-export const consoleDeployCancelledTemplate = (workflow_run: any) => {
-  return [
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `${ResultIcons.Cancelled}  ${getDeploymentEnv(workflow_run)} Deployment #${workflow_run.run_number} was cancelled.`,
-      }
-    },
-    getCommitEmbeds(workflow_run),
-  ];
-}
+export const consoleDeployCancelledTemplate: TemplateFunc = (workflow_run: any) => {
+  const header = `Deployment #${workflow_run.run_number} was cancelled.`;
 
-export const pushToMainTemplate = (pushEventData: {
-  repository: {
-    full_name: string
-  },
-  compare: string,
-  commits: Array<{
-    id: string,
-    message: string,
-    author: {
-      name: string
-    }
-  }>
-}) => {
-  const link = hideLinkEmbed(pushEventData.compare);
-
-  return `Push to ${bold(pushEventData.repository.full_name + '/main')}!\n` +
-      `${codeBlock(pushEventData.commits.map(formatCommit).join('\n'))}` +
-      `\nDiff: ${link}`;
+  return {
+    text: header,
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `${ResultIcons.Cancelled}  ${getDeploymentEnv(workflow_run)} ${header}`,
+        }
+      },
+      getCommitEmbeds(workflow_run),
+    ]
+  };
 }
 
 export const getEnv = (jobName: CirceCiJobs) => {
@@ -153,7 +159,7 @@ export const getEnv = (jobName: CirceCiJobs) => {
   throw new Error("Unknown job name");
 }
 
-export const getDeploymentTemplate = ({
+export const getDeploymentTemplate: TemplateFunc = ({
   jobName,
   payload
 }: {
@@ -174,6 +180,8 @@ export const getDeploymentTemplate = ({
       icon = ResultIcons.Failed;
       break;
   }
+
+  const header = `[Neon] Job *${jobName}* completed with status ${payload.state}`;
 
   const result: (Block|KnownBlock)[] = [
     {
@@ -200,5 +208,8 @@ export const getDeploymentTemplate = ({
     console.log(e);
   }
 
-  return result;
+  return {
+    text: header,
+    blocks: result,
+  };
 }

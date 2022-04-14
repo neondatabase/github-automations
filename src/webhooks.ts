@@ -6,7 +6,7 @@ import {
   consoleDeployTimedOutTemplate,
   consoleDeployCancelledTemplate,
   getDeploymentTemplate,
-  sendDeployNotification,
+  sendDeployNotification, MessageContent,
 } from "./notification_helpers";
 import Queue from "async-await-queue";
 import {sleep} from "./utils";
@@ -16,9 +16,10 @@ export = (app: Probot) => {
   const CONSOLE_DEPLOY_WORKFLOW_ID = parseInt(process.env.CONSOLE_DEPLOY_WORKFLOW_ID || '');
 
   const milestoneQueue = new Queue(1);
+  const notificationsQueue = new Queue(1);
 
   app.on(["issues.opened", "issues.edited"], async (context) => {
-    console.log("issues.opened: ", context.payload);
+    // console.log("issues.opened: ", context.payload);
 
     // add issue to project and set few fields
     let issue = await Issue.load(context.octokit, context.payload.issue.node_id);
@@ -73,57 +74,44 @@ export = (app: Probot) => {
   });
 
   app.on(["workflow_run"], async (context) => {
-    console.log("workflow_run: ", context.payload);
-
     const workflow_run = context.payload.workflow_run;
-    if (context.payload.action === 'completed' && workflow_run) {
-      let msg;
-      switch (workflow_run.workflow_id) {
-        // deploy to staging
-        case CONSOLE_DEPLOY_WORKFLOW_ID:
-          switch (workflow_run.conclusion) {
-            case "success":
-              msg = consoleDeploySucceedTemplate(workflow_run);
-              break;
-            case "failure":
-              msg = consoleDeployFailedTemplate(workflow_run);
-              break;
-            case "cancelled":
-              msg = consoleDeployCancelledTemplate(workflow_run);
-              break;
-            case "timed_out":
-              msg = consoleDeployTimedOutTemplate(workflow_run);
-              break;
-          }
-          break;
-        default:
-          break;
-      }
 
-      if (msg) {
-        await sendDeployNotification(msg);
-      }
+    if (context.payload.action === 'completed' && workflow_run) {
+      notificationsQueue.run(async () => {
+      console.log("workflow_run: ", context.id);
+      console.log(context.payload)
+
+        let msg: MessageContent | undefined;
+        switch (workflow_run.workflow_id) {
+          // deploy to staging
+          case CONSOLE_DEPLOY_WORKFLOW_ID:
+            switch (workflow_run.conclusion) {
+              case "success":
+                msg = consoleDeploySucceedTemplate(workflow_run);
+                break;
+              case "failure":
+                msg = consoleDeployFailedTemplate(workflow_run);
+                break;
+              case "cancelled":
+                msg = consoleDeployCancelledTemplate(workflow_run);
+                break;
+              case "timed_out":
+                msg = consoleDeployTimedOutTemplate(workflow_run);
+                break;
+            }
+            break;
+          default:
+            break;
+        }
+
+        if (msg) {
+          await sendDeployNotification(msg);
+        }
+      });
     }
 
   });
 
-
-
-  // app.on(['push'], async (context) => {
-  //   // we don't need to deploy our rfcs so just listen to push to main
-  //   // if (context.payload.repository.name !== "rfcs") {
-  //   //   return;
-  //   // }
-  //
-  //   console.log("push: ", context.payload);
-  //
-  //   if (context.payload.ref === 'refs/heads/main') {
-  //     await webhook.send({
-  //       content: pushToMainTemplate(context.payload),
-  //     });
-  //   }
-  // });
-  //
   app.on(["status"], async (context) => {
     // console.log("received status event", context.payload);
     // first we check it's neondatabase/neon repo and main branch
