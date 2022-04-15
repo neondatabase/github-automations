@@ -76,36 +76,46 @@ export = (app: Probot) => {
   app.on(["workflow_run"], async (context) => {
     const workflow_run = context.payload.workflow_run;
 
-    if (context.payload.action === 'completed' && context.payload.sender.login !== 'vipvap' && workflow_run) {
+    if (
+      context.payload.action === 'completed'
+      && context.payload.sender.login !== 'vipvap'
+      && workflow_run
+      && [process.env.CONSOLE_PRODUCTION_BRANCH_NAME, process.env.CONSOLE_STAGING_BRANCH_NAME].includes(workflow_run.head_branch)
+    ) {
       notificationsQueue.run(async () => {
-      console.log("workflow_run: ", context.id);
-      console.log(context.payload)
+        try {
+          console.log("workflow_run: ", context.id);
+          console.log(context.payload)
 
-        let msg: MessageContent | undefined;
-        switch (workflow_run.workflow_id) {
-          // deploy to staging
-          case CONSOLE_DEPLOY_WORKFLOW_ID:
-            switch (workflow_run.conclusion) {
-              case "success":
-                msg = consoleDeploySucceedTemplate(workflow_run);
-                break;
-              case "failure":
-                msg = consoleDeployFailedTemplate(workflow_run);
-                break;
-              case "cancelled":
-                msg = consoleDeployCancelledTemplate(workflow_run);
-                break;
-              case "timed_out":
-                msg = consoleDeployTimedOutTemplate(workflow_run);
-                break;
-            }
-            break;
-          default:
-            break;
-        }
+          let msg: MessageContent | undefined;
+          switch (workflow_run.workflow_id) {
+            // deploy to staging
+            case CONSOLE_DEPLOY_WORKFLOW_ID:
+              switch (workflow_run.conclusion) {
+                case "success":
+                  msg = consoleDeploySucceedTemplate(workflow_run);
+                  break;
+                case "failure":
+                  msg = consoleDeployFailedTemplate(workflow_run);
+                  break;
+                case "cancelled":
+                  msg = consoleDeployCancelledTemplate(workflow_run);
+                  break;
+                case "timed_out":
+                  msg = consoleDeployTimedOutTemplate(workflow_run);
+                  break;
+              }
+              break;
+            default:
+              break;
+          }
 
-        if (msg) {
-          await sendDeployNotification(msg);
+          if (msg) {
+            await sendDeployNotification(msg);
+          }
+        } catch(e) {
+          console.log('failed')
+          console.log(e);
         }
       });
     }
