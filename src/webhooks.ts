@@ -81,6 +81,7 @@ export = (app: Probot) => {
       && context.payload.sender.login !== 'vipvap'
       && workflow_run
       && [process.env.CONSOLE_PRODUCTION_BRANCH_NAME, process.env.CONSOLE_STAGING_BRANCH_NAME].includes(workflow_run.head_branch)
+      && workflow_run.event === 'push'
     ) {
       notificationsQueue.run(async () => {
         try {
