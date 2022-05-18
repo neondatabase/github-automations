@@ -6,11 +6,27 @@ type TemplateFunc = (args: any) => MessageContent | undefined;
 
 const slackClient = new WebClient(process.env.SLACK_TOKEN || '');
 
-export const sendDeployNotification = async (data: MessageContent) => {
+export const getEnvChannelName = (workflow_run: { head_branch?: string }) => {
+  if (workflow_run.head_branch === process.env.CONSOLE_PRODUCTION_BRANCH_NAME) {
+    return process.env.SLACK_DEPLOY_NOTIFICATIONS_CHANNEL_PRODUCTION
+  }
+
+  if (workflow_run.head_branch === process.env.CONSOLE_STAGING_BRANCH_NAME) {
+    return process.env.SLACK_DEPLOY_NOTIFICATIONS_CHANNEL
+  }
+  return;
+}
+
+export const sendDeployNotification = async (data: MessageContent, channelName?: string) => {
+  if (!channelName) {
+    console.log("Unknown chat name");
+    return
+  }
+
   try {
     const result = await slackClient.chat.postMessage({
       ...data,
-      channel: process.env.SLACK_DEPLOY_NOTIFICATIONS_CHANNEL || '',
+      channel: channelName,
     });
     console.log('Chat message request completed:', result);
   } catch (e) {

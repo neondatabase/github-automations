@@ -6,7 +6,7 @@ import {
   consoleDeployTimedOutTemplate,
   consoleDeployCancelledTemplate,
   getDeploymentTemplate,
-  sendDeployNotification, MessageContent,
+  sendDeployNotification, MessageContent, getEnvChannelName,
 } from "./notification_helpers";
 import Queue from "async-await-queue";
 import {sleep} from "./utils";
@@ -112,7 +112,7 @@ export = (app: Probot) => {
           }
 
           if (msg) {
-            await sendDeployNotification(msg);
+            await sendDeployNotification(msg, getEnvChannelName(workflow_run));
           }
         } catch(e) {
           console.log('failed')
