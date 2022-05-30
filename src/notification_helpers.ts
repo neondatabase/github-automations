@@ -176,6 +176,19 @@ export const getEnv = (jobName: CirceCiJobs) => {
   throw new Error("Unknown job name");
 }
 
+export const getChatName = (jobName: string) => {
+  switch (jobName) {
+    case CirceCiJobs.DeployProxyProduction:
+    case CirceCiJobs.DeployProduction:
+      return process.env.SLACK_DEPLOY_NOTIFICATIONS_CHANNEL_PRODUCTION;
+    case CirceCiJobs.DeployProxyStaging:
+    case CirceCiJobs.DeployStaging:
+      return process.env.SLACK_DEPLOY_NOTIFICATIONS_CHANNEL;
+  }
+
+  throw new Error("Unknown job name");
+}
+
 export const getDeploymentTemplate: TemplateFunc = ({
   jobName,
   payload

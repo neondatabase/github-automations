@@ -6,7 +6,7 @@ import {
   consoleDeployTimedOutTemplate,
   consoleDeployCancelledTemplate,
   getDeploymentTemplate,
-  sendDeployNotification, MessageContent, getEnvChannelName,
+  sendDeployNotification, MessageContent, getEnvChannelName, getChatName,
 } from "./notification_helpers";
 import Queue from "async-await-queue";
 import {sleep} from "./utils";
@@ -157,7 +157,7 @@ export = (app: Probot) => {
     }
 
     try {
-      await sendDeployNotification(template)
+      await sendDeployNotification(template, getChatName(jobName));
     } catch(e) {
       console.log(e)
     }
