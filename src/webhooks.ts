@@ -127,7 +127,7 @@ export = (app: Probot) => {
     // console.log("received status event", context.payload);
     // first we check it's neondatabase/neon repo and main branch
     if (context.payload.repository.name !== "neon"
-      || !context.payload.branches.find((b) => b.name === "main")
+      || !context.payload.branches.find((b) => (b.name === "main" || b.name === "release"))
       || context.payload.state === 'pending') {
       return;
     }
