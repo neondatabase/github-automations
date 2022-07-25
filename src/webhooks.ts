@@ -5,7 +5,7 @@ import {
   deploySucceedTemplate,
   deployTimedOutTemplate,
   deployCancelledTemplate,
-  sendDeployNotification, MessageContent, getEnvChannelName,
+  sendDeployNotification, MessageContent, getEnvChannelName
 } from "./notification_helpers";
 import Queue from "async-await-queue";
 import {sleep} from "./utils";
@@ -80,7 +80,12 @@ export = (app: Probot) => {
       context.payload.action === 'completed'
       && context.payload.sender.login !== 'vipvap'
       && workflow_run
-      && [process.env.CONSOLE_PRODUCTION_BRANCH_NAME, process.env.CONSOLE_STAGING_BRANCH_NAME].includes(workflow_run.head_branch)
+      && [
+        process.env.CONSOLE_PRODUCTION_BRANCH_NAME,
+        process.env.CONSOLE_STAGING_BRANCH_NAME,
+        process.env.NEON_STAGING_BRANCH_NAME,
+        process.env.NEON_PRODUCTION_BRANCH_NAME,
+      ].includes(workflow_run.head_branch)
       && workflow_run.event === 'push'
     ) {
       notificationsQueue.run(async () => {
