@@ -1,4 +1,3 @@
-import {CirceCiJobs} from "./circleci";
 import {Block, ChatPostMessageArguments, KnownBlock, WebClient} from "@slack/web-api";
 
 export type MessageContent = Omit<ChatPostMessageArguments, 'channel'>;
@@ -6,13 +5,26 @@ type TemplateFunc = (args: any) => MessageContent | undefined;
 
 const slackClient = new WebClient(process.env.SLACK_TOKEN || '');
 
-export const getEnvChannelName = (workflow_run: { head_branch?: string }) => {
-  if (workflow_run.head_branch === process.env.CONSOLE_PRODUCTION_BRANCH_NAME) {
-    return process.env.SLACK_DEPLOY_NOTIFICATIONS_CHANNEL_PRODUCTION
-  }
+const isConsoleRepo = (workflow_run: any) => (workflow_run.repository.name === 'cloud')
+const isNeonRepo = (workflow_run: any) => (workflow_run.repository.name === 'neon')
 
-  if (workflow_run.head_branch === process.env.CONSOLE_STAGING_BRANCH_NAME) {
-    return process.env.SLACK_DEPLOY_NOTIFICATIONS_CHANNEL
+export const getEnvChannelName = (workflow_run: { head_branch?: string }) => {
+  if (isConsoleRepo(workflow_run)) {
+    if (workflow_run.head_branch === process.env.CONSOLE_PRODUCTION_BRANCH_NAME) {
+      return process.env.SLACK_DEPLOY_NOTIFICATIONS_CHANNEL_PRODUCTION
+    }
+
+    if (workflow_run.head_branch === process.env.CONSOLE_STAGING_BRANCH_NAME) {
+      return process.env.SLACK_DEPLOY_NOTIFICATIONS_CHANNEL
+    }
+  } else if (isNeonRepo(workflow_run)) {
+    if (workflow_run.head_branch == process.env.NEON_STAGING_BRANCH_NAME) {
+      return process.env.SLACK_DEPLOY_NOTIFICATIONS_CHANNEL
+    }
+    if (workflow_run.head_branch == process.env.NEON_PRODUCTION_BRANCH_NAME) {
+      return process.env.SLACK_DEPLOY_NOTIFICATIONS_CHANNEL_PRODUCTION
+
+    }
   }
   return;
 }
@@ -77,16 +89,25 @@ const getCommitEmbeds: (w: any) => Block|KnownBlock = (
 }
 
 export const getDeploymentEnv = (workflow_run: any) => {
-  if (workflow_run.head_branch == process.env.CONSOLE_STAGING_BRANCH_NAME) {
-    return "*[ STAGING CONSOLE ]*";
-  }
-  if (workflow_run.head_branch == process.env.CONSOLE_PRODUCTION_BRANCH_NAME) {
-    return "*[ PRODUCTION CONSOLE ]*";
+  if (isConsoleRepo(workflow_run)) {
+    if (workflow_run.head_branch == process.env.CONSOLE_STAGING_BRANCH_NAME) {
+      return "*[ STAGING CONSOLE ]*";
+    }
+    if (workflow_run.head_branch == process.env.CONSOLE_PRODUCTION_BRANCH_NAME) {
+      return "*[ PRODUCTION CONSOLE ]*";
+    }
+  } else if (isNeonRepo(workflow_run)) {
+    if (workflow_run.head_branch == process.env.NEON_STAGING_BRANCH_NAME) {
+      return "*[ STAGING NEON ]*";
+    }
+    if (workflow_run.head_branch == process.env.NEON_PRODUCTION_BRANCH_NAME) {
+      return "*[ PRODUCTION NEON ]*";
+    }
   }
   throw new Error("Unknown deployment workflow run id");
 }
 
-export const consoleDeploySucceedTemplate: TemplateFunc = (workflow_run: any) => {
+export const deploySucceedTemplate: TemplateFunc = (workflow_run: any) => {
   const header = "New console version has been successfully deployed."
 
   return {
@@ -106,7 +127,7 @@ export const consoleDeploySucceedTemplate: TemplateFunc = (workflow_run: any) =>
   };
 }
 
-export const consoleDeployFailedTemplate: TemplateFunc = (workflow_run: any) => {
+export const deployFailedTemplate: TemplateFunc = (workflow_run: any) => {
   const header = `Deployment #${workflow_run.run_number} failed`
 
   return {
@@ -126,7 +147,7 @@ export const consoleDeployFailedTemplate: TemplateFunc = (workflow_run: any) => 
   };
 }
 
-export const consoleDeployTimedOutTemplate: TemplateFunc = (workflow_run: any) => {
+export const deployTimedOutTemplate: TemplateFunc = (workflow_run: any) => {
   const header = `Deployment #${workflow_run.run_number} timed out.`;
   return {
     text: header,
@@ -143,7 +164,7 @@ export const consoleDeployTimedOutTemplate: TemplateFunc = (workflow_run: any) =
   };
 }
 
-export const consoleDeployCancelledTemplate: TemplateFunc = (workflow_run: any) => {
+export const deployCancelledTemplate: TemplateFunc = (workflow_run: any) => {
   const header = `Deployment #${workflow_run.run_number} was cancelled.`;
 
   return {
@@ -158,88 +179,5 @@ export const consoleDeployCancelledTemplate: TemplateFunc = (workflow_run: any) 
       },
       getCommitEmbeds(workflow_run),
     ]
-  };
-}
-
-export const getEnv = (jobName: CirceCiJobs) => {
-  switch (jobName) {
-    case CirceCiJobs.DeployProxyProduction:
-      return "*[ PRODUCTION PROXY ]*";
-    case CirceCiJobs.DeployProxyStaging:
-      return "*[ STAGING PROXY ]*";
-    case CirceCiJobs.DeployStaging:
-      return "*[ STAGING NEON ]*";
-    case CirceCiJobs.DeployProduction:
-      return "*[ PRODUCTION NEON ]*";
-  }
-
-  throw new Error("Unknown job name");
-}
-
-export const getChatName = (jobName: string) => {
-  switch (jobName) {
-    case CirceCiJobs.DeployProxyProduction:
-    case CirceCiJobs.DeployProduction:
-      return process.env.SLACK_DEPLOY_NOTIFICATIONS_CHANNEL_PRODUCTION;
-    case CirceCiJobs.DeployProxyStaging:
-    case CirceCiJobs.DeployStaging:
-      return process.env.SLACK_DEPLOY_NOTIFICATIONS_CHANNEL;
-  }
-
-  throw new Error("Unknown job name");
-}
-
-export const getDeploymentTemplate: TemplateFunc = ({
-  jobName,
-  payload
-}: {
-  jobName: string,
-  payload: any,
-}) => {
-  if (!Object.values(CirceCiJobs).includes(jobName as CirceCiJobs) || !payload.target_url) {
-    return
-  }
-
-  let icon;
-  switch (payload.state) {
-    case 'success':
-      icon = ResultIcons.Success;
-      break;
-    case 'failure':
-    case 'error':
-      icon = ResultIcons.Failed;
-      break;
-  }
-
-  const header = `[Neon] Job *${jobName}* completed with status ${payload.state}`;
-
-  const result: (Block|KnownBlock)[] = [
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
-        text: `${icon} ${getEnv(jobName as CirceCiJobs)} Job *${jobName}* completed with status \`${payload.state}\`\n` +
-          `Job details: <${payload.target_url}|CircleCI>\n` +
-          `Commit details:`,
-      }
-    },
-  ];
-
-  try {
-    const embeds = getCommitEmbeds({
-      head_commit: {
-        ...payload.commit.commit,
-        id: payload.commit.sha,
-      },
-      repository: payload.repository
-    });
-    result.push(embeds);
-  } catch(e) {
-    console.log(e);
-  }
-
-  return {
-    text: header,
-    blocks: result,
   };
 }
