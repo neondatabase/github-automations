@@ -108,7 +108,12 @@ export const getDeploymentEnv = (workflow_run: any) => {
 }
 
 export const deploySucceedTemplate: TemplateFunc = (workflow_run: any) => {
-  const header = "New console version has been successfully deployed."
+  let component = 'console';
+  if (isNeonRepo(workflow_run)) {
+    component = 'storage'
+  }
+
+  const header = `New ${component} version has been successfully deployed.`
 
   return {
     text: header,
