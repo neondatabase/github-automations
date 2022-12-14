@@ -15,19 +15,21 @@ const PROJECT_ID = 'PVT_kwDOBKF3Cs1e-g'
 // gh api graphql -f query='
 // query{
 //   node(id: "PVT_kwDOBKF3Cs1e-g") {
-//     ... on ProjectV2 {
+//   ... on ProjectV2 {
 //       fields(first: 20) {
 //         nodes {
-//           id
-//           name
-//           settings
-//         }
+//         ... on ProjectV2Field {
+//             name,
+//               id
+//           }
+//         },
+//         totalCount
 //       }
 //     }
 //   }
 // }'
-const TRACKED_IN_FIELD_ID = 'MDE2OlByb2plY3ROZXh0RmllbGQ0ODg0OTM='
-const PROGRESS_FIELD_ID = 'MDE2OlByb2plY3ROZXh0RmllbGQ5NzkxMzc='
+const TRACKED_IN_FIELD_ID = 'PVTF_lADOBKF3Cs1e-s4AB3Qt'
+const PROGRESS_FIELD_ID = 'PVTF_lADOBKF3Cs1e-s4ADvDB'
 
 interface Milestone {
   id: number;
@@ -391,7 +393,7 @@ const setField = `
         fieldId: $tracked_field_id,
         value: { text: $value }
       }) {
-        item { id }
+        projectV2Item { id }
       }
     }
   `;
