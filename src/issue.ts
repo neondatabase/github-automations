@@ -4,18 +4,18 @@ import {isDryRun} from "./utils";
 
 // gh api graphql -f query='
 //   query {
-//     organization(login: "zenithdb"){
-//       projectNext(number: 6) {
+//     organization(login: "neondatabase"){
+//       projectV2(number: 6) {
 //           id
 //       }
 //     }
 //   }'
-const PROJECT_ID = 'PN_kwDOBKF3Cs1e-g'
+const PROJECT_ID = 'PVT_kwDOBKF3Cs1e-g'
 
 // gh api graphql -f query='
 // query{
-//   node(id: "PN_kwDOBKF3Cs1e-g") {
-//     ... on ProjectNext {
+//   node(id: "PVT_kwDOBKF3Cs1e-g") {
+//     ... on ProjectV2 {
 //       fields(first: 20) {
 //         nodes {
 //           id
@@ -186,7 +186,7 @@ export class Issue {
     });
     console.log("addToTheProject: ", resp);
 
-    let project_item_id: string = resp.addProjectNextItem.projectNextItem.id
+    let project_item_id: string = resp.addProjectV2ItemById.item.id
 
     // set tracked_in field
     if (!isDryRun()) {
@@ -237,7 +237,7 @@ export class Issue {
         issue_number: issueData.number,
       });
 
-      console.log(`process ${issue}`);
+      console.log(`process ${issue.id}`, issue);
 
       const zIssue = await Issue.load(kit, issue.node_id);
       await zIssue.addToTheProject(kit);
@@ -374,24 +374,24 @@ const issueWithParents = `
 
 const addToTheProject = `
     mutation ($project_id: ID!, $issue_id: ID!) {
-      addProjectNextItem(input: {
+      addProjectV2ItemById(input: {
         projectId: $project_id,
         contentId: $issue_id
       }) {
-        projectNextItem { id }
+      item { id }
       }
     }
   `;
 
 const setField = `
     mutation ($project_id: ID!, $project_item_id: ID!, $tracked_field_id: ID!, $value: String!) {
-      updateProjectNextItemField(input: {
+      updateProjectV2ItemFieldValue(input: {
         projectId: $project_id,
         itemId: $project_item_id,
         fieldId: $tracked_field_id,
         value: $value
       }) {
-        projectNextItem { id }
+        item { id }
       }
     }
   `;
