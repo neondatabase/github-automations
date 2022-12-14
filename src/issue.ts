@@ -389,7 +389,7 @@ const setField = `
         projectId: $project_id,
         itemId: $project_item_id,
         fieldId: $tracked_field_id,
-        value: $value
+        value: { text: $value }
       }) {
         item { id }
       }
