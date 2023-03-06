@@ -204,15 +204,18 @@ export class Issue {
     });
     console.log("added to the Engineering project: ", resp);
 
+    let project_item_id: string = resp.addProjectV2ItemById.item.id;
+    let console_project_item_id: string = ''
+
     if (this.belongsToConsole) {
       resp = await kit.graphql(addToTheProject, {
         issue_id: this.node_id,
         project_id: CONSOLE_TASKS_PROJECT_ID,
       });
       console.log("added to the Console Project: ", resp);
+      console_project_item_id = resp.addProjectV2ItemById.item.id;
     }
 
-    let project_item_id: string = resp.addProjectV2ItemById.item.id
 
     // set tracked_in field
     if (!isDryRun()) {
@@ -226,10 +229,10 @@ export class Issue {
         value: trackedInVal,
       });
 
-      if (this.belongsToConsole) {
+      if (console_project_item_id) {
         resp = await kit.graphql(setField, {
           project_id: CONSOLE_TASKS_PROJECT_ID,
-          project_item_id: project_item_id,
+          project_item_id: console_project_item_id,
           tracked_field_id: FIELDS_IDS_BY_PROJECT[CONSOLE_TASKS_PROJECT_ID].trackedIn,
           value: trackedInVal,
         });
@@ -248,10 +251,10 @@ export class Issue {
         value: progressVal,
       });
 
-      if (this.belongsToConsole) {
+      if (console_project_item_id) {
         resp = await kit.graphql(setField, {
           project_id: CONSOLE_TASKS_PROJECT_ID,
-          project_item_id: project_item_id,
+          project_item_id: console_project_item_id,
           tracked_field_id: FIELDS_IDS_BY_PROJECT[CONSOLE_TASKS_PROJECT_ID].progress,
           value: progressVal,
         });
