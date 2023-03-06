@@ -31,6 +31,19 @@ const PROJECT_ID = 'PVT_kwDOBKF3Cs1e-g'
 const TRACKED_IN_FIELD_ID = 'PVTF_lADOBKF3Cs1e-s4AB3Qt'
 const PROGRESS_FIELD_ID = 'PVTF_lADOBKF3Cs1e-s4ADvDB'
 
+const CONSOLE_TASKS_PROJECT_ID = "PVT_kwDOBKF3Cs4AMKWT";
+
+const FIELDS_IDS_BY_PROJECT = {
+  [PROJECT_ID]: {
+    trackedIn: TRACKED_IN_FIELD_ID,
+    progress: PROGRESS_FIELD_ID,
+  },
+  [CONSOLE_TASKS_PROJECT_ID]: {
+    trackedIn: "PVTF_lADOBKF3Cs4AMKWTzgHwfhM",
+    progress: "PVTF_lADOBKF3Cs4AMKWTzgHwfhU",
+  }
+}
+
 interface Milestone {
   id: number;
   node_id: string;
@@ -55,6 +68,7 @@ export class Issue {
   subtasks: Array<[boolean, string, IssueData | undefined]>;
   owner_login: string;
   milestone?: Milestone;
+  belongsToConsole?: boolean;
 
   mentions: Array<Issue>;
   parents: Array<Issue>;
@@ -72,6 +86,7 @@ export class Issue {
     this.parents = [];
     this.owner_login = node.repository.owner.login;
     this.milestone = node.milestone;
+    this.belongsToConsole = !!(node.labels?.nodes || []).find((l: any) => (l.name === 'c/console'));
 
 
     // fill children
@@ -95,6 +110,7 @@ export class Issue {
     let resp: GraphQlQueryResponseData = await kit.graphql(issueWithParents, {
       issue_id: issueNodeId,
     });
+    console.log(resp);
     let issue = new Issue(resp.node);
     console.log("new ZenithIssue object: ", issue);
     return issue;
@@ -186,30 +202,60 @@ export class Issue {
       issue_id: this.node_id,
       project_id: PROJECT_ID,
     });
-    console.log("addToTheProject: ", resp);
+    console.log("added to the Engineering project: ", resp);
+
+    if (this.belongsToConsole) {
+      resp = await kit.graphql(addToTheProject, {
+        issue_id: this.node_id,
+        project_id: CONSOLE_TASKS_PROJECT_ID,
+      });
+      console.log("added to the Console Project: ", resp);
+    }
 
     let project_item_id: string = resp.addProjectV2ItemById.item.id
 
     // set tracked_in field
     if (!isDryRun()) {
       console.log("set tracked in for", this.title);
+      const trackedInVal = this.trackedIn();
+
       resp = await kit.graphql(setField, {
         project_id: PROJECT_ID,
         project_item_id: project_item_id,
         tracked_field_id: TRACKED_IN_FIELD_ID,
-        value: this.trackedIn(),
+        value: trackedInVal,
       });
+
+      if (this.belongsToConsole) {
+        resp = await kit.graphql(setField, {
+          project_id: CONSOLE_TASKS_PROJECT_ID,
+          project_item_id: project_item_id,
+          tracked_field_id: FIELDS_IDS_BY_PROJECT[CONSOLE_TASKS_PROJECT_ID].trackedIn,
+          value: trackedInVal,
+        });
+      }
     }
     console.log("setTrackedIn: ", resp);
 
     // set progress field
     if (!isDryRun()) {
+      const progressVal = this.progress();
+
       resp = await kit.graphql(setField, {
         project_id: PROJECT_ID,
         project_item_id: project_item_id,
         tracked_field_id: PROGRESS_FIELD_ID,
-        value: this.progress(),
+        value: progressVal,
       });
+
+      if (this.belongsToConsole) {
+        resp = await kit.graphql(setField, {
+          project_id: CONSOLE_TASKS_PROJECT_ID,
+          project_item_id: project_item_id,
+          tracked_field_id: FIELDS_IDS_BY_PROJECT[CONSOLE_TASKS_PROJECT_ID].progress,
+          value: progressVal,
+        });
+      }
     }
     console.log("setProgressField: ", resp);
 
@@ -339,6 +385,12 @@ const issueWithParents = `
             name
             owner {
               login
+            }
+          }
+          labels(last: 100) {
+            nodes {
+              id
+              name
             }
           }
           timelineItems(last: 100) {
