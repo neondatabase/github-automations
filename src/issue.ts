@@ -86,7 +86,7 @@ export class Issue {
     this.parents = [];
     this.owner_login = node.repository.owner.login;
     this.milestone = node.milestone;
-    this.belongsToConsole = !!(node.labels?.nodes || []).find((l: any) => (l.name === 'c/console'));
+    this.belongsToConsole = !!(node.labels?.nodes || []).find((l: any) => (l.name === 'c/console/ui'));
 
 
     // fill children
