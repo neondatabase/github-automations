@@ -5,7 +5,7 @@ const FREE = "BFBFBF";
 
 const COLORS: Record<string, string> = {
   argon: "ffba72",
-  helium: 'b89894',
+  helium: "fd7249",
 }
 
 export const PRLabeledHandler = async (context: WebhookEvent<EventPayloads.WebhookPayloadPullRequest> & Omit<Context<any>, keyof WebhookEvent<any>>) => {
