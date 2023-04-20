@@ -9,6 +9,11 @@ import {
 } from "./notification_helpers";
 import Queue from "async-await-queue";
 import {sleep} from "./utils";
+import {
+  PRLabeledHandler,
+  PRMergedOrClosedHandler, PROpenedHandler,
+  PRUnLabeledHandler
+} from "./deploy_preview_label_handler";
 
 // webhooks entry point to the probot app
 export = (app: Probot) => {
@@ -71,6 +76,22 @@ export = (app: Probot) => {
         title: nextMilestone.title,
       } : null);
     });
+  });
+
+  app.on("pull_request.labeled", async (context) => {
+    PRLabeledHandler(context)
+  });
+
+  app.on("pull_request.opened", async (context) => {
+    PROpenedHandler(context)
+  });
+
+  app.on(["pull_request.merged", "pull_request.closed"], async (context) => {
+    PRMergedOrClosedHandler(context)
+  });
+
+  app.on(["pull_request.unlabeled"], async (context) => {
+    PRUnLabeledHandler(context)
   });
 
   app.on(["workflow_run"], async (context) => {
