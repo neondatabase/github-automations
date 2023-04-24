@@ -2,10 +2,20 @@ import { EventPayloads, WebhookEvent } from "@octokit/webhooks";
 import { Context } from "probot/lib/context";
 
 const FREE = "BFBFBF";
+const OCCUPIED = "2fad40";
 
 const COLORS: Record<string, string> = {
   argon: "ffba72",
   helium: "fd7249",
+  krypton: "d0ffb3",
+  xenon: "c3bdff",
+  radon: "fa4343",
+  oganesson: "927acc",
+  hydrogen: "43abfa",
+  nitrogen: "332ffa",
+  oxygen: "29a6ff",
+  fluorine: "40995b",
+  chlorine: "a7ab57",
 }
 
 export const PRLabeledHandler = async (context: WebhookEvent<EventPayloads.WebhookPayloadPullRequest> & Omit<Context<any>, keyof WebhookEvent<any>>) => {
@@ -48,15 +58,12 @@ export const PRLabeledHandler = async (context: WebhookEvent<EventPayloads.Webho
     }
   });
 
-  if (COLORS[previewName]) {
-    const res = await context.octokit.request('PATCH /repos/{owner}/{repo}/labels/{name}', {
-      owner: context.payload.repository.owner.login,
-      repo: context.payload.repository.name,
-      name: labelName,
-      color: COLORS[previewName],
-    });
-    console.log(res);
-  }
+  await context.octokit.request('PATCH /repos/{owner}/{repo}/labels/{name}', {
+    owner: context.payload.repository.owner.login,
+    repo: context.payload.repository.name,
+    name: labelName,
+    color: COLORS[previewName] || OCCUPIED,
+  });
 }
 
 export const PRUnLabeledHandler = async (context: WebhookEvent<EventPayloads.WebhookPayloadPullRequest> & Omit<Context<any>, keyof WebhookEvent<any>>) => {
@@ -141,12 +148,10 @@ export const PROpenedHandler = async (context: WebhookEvent<EventPayloads.Webhoo
     return;
   }
 
-  if (COLORS[previewName]) {
-    await context.octokit.request('PATCH /repos/{owner}/{repo}/labels/{name}', {
-      owner: context.payload.repository.owner.login,
-      repo: context.payload.repository.name,
-      name: labelName,
-      color: COLORS[previewName],
-    });
-  }
+  await context.octokit.request('PATCH /repos/{owner}/{repo}/labels/{name}', {
+    owner: context.payload.repository.owner.login,
+    repo: context.payload.repository.name,
+    name: labelName,
+    color: COLORS[previewName] || OCCUPIED,
+  });
 }
