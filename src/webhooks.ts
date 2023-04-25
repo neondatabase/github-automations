@@ -121,7 +121,10 @@ export = (app: Probot) => {
             case NEON_DEPLOY_WORKFLOW_ID:
               switch (workflow_run.conclusion) {
                 case "success":
-                  msg = deploySucceedTemplate(workflow_run);
+                  if (workflow_run.workflow_id != NEON_DEPLOY_WORKFLOW_ID) {
+                    // Don't send success messages for neon repo workflows, as they are misleading
+                    msg = deploySucceedTemplate(workflow_run);
+                  }
                   break;
                 case "failure":
                   msg = deployFailedTemplate(workflow_run);
