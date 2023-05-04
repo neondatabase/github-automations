@@ -63,6 +63,7 @@ export const PRLabeledHandler = async (context: WebhookEvent<EventPayloads.Webho
     repo: context.payload.repository.name,
     name: labelName,
     color: COLORS[previewName] || OCCUPIED,
+    description: `Preview is occupied by #${context.payload.pull_request.number}`,
   });
 }
 
@@ -89,6 +90,7 @@ export const PRUnLabeledHandler = async (context: WebhookEvent<EventPayloads.Web
     repo: context.payload.repository.name,
     name: labelName,
     color: FREE,
+    description: 'Free preview environment',
   });
 }
 
@@ -123,6 +125,7 @@ export const PRMergedOrClosedHandler = async (context: WebhookEvent<EventPayload
       repo: context.payload.repository.name,
       name: labelName,
       color: FREE,
+      description: 'Free preview environment',
     });
   });
 }
@@ -153,5 +156,6 @@ export const PROpenedHandler = async (context: WebhookEvent<EventPayloads.Webhoo
     repo: context.payload.repository.name,
     name: labelName,
     color: COLORS[previewName] || OCCUPIED,
+    description: `Preview is occupied by #${context.payload.pull_request.number}`,
   });
 }
