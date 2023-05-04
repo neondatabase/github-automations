@@ -63,7 +63,7 @@ describe("Probot app", () => {
 
         // simulate response
         let resp : any = {data:{}};
-        resp.data[mutation] = { projectNextItem: { id: 'proj_id' }};
+        resp.data[mutation] = { item: { id: 'proj_id' }};
         return resp;
       });
 
@@ -72,9 +72,9 @@ describe("Probot app", () => {
 
     expect(mock.pendingMocks()).toStrictEqual([]);
     expect(mutations).toStrictEqual([
-      'addProjectNextItem',
-      'updateProjectNextItemField',
-      'updateProjectNextItemField'
+      'addProjectV2ItemById',
+      'updateProjectV2ItemFieldValue',
+      'updateProjectV2ItemFieldValue'
     ]);
   });
 
