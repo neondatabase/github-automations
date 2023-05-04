@@ -10,8 +10,6 @@ const { parse } = require('graphql');
 const fs = require("fs");
 const path = require("path");
 
-jest.mock('../src/discord_helpers', () => ({}))
-
 const privateKey = fs.readFileSync(
   path.join(__dirname, "fixtures/mock-cert.pem"),
   "utf-8"
