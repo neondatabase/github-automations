@@ -10,8 +10,6 @@ const { parse } = require('graphql');
 const fs = require("fs");
 const path = require("path");
 
-jest.mock('../src/discord_helpers', () => ({}))
-
 const privateKey = fs.readFileSync(
   path.join(__dirname, "fixtures/mock-cert.pem"),
   "utf-8"
@@ -65,7 +63,7 @@ describe("Probot app", () => {
 
         // simulate response
         let resp : any = {data:{}};
-        resp.data[mutation] = { projectNextItem: { id: 'proj_id' }};
+        resp.data[mutation] = { item: { id: 'proj_id' }};
         return resp;
       });
 
@@ -74,9 +72,9 @@ describe("Probot app", () => {
 
     expect(mock.pendingMocks()).toStrictEqual([]);
     expect(mutations).toStrictEqual([
-      'addProjectNextItem',
-      'updateProjectNextItemField',
-      'updateProjectNextItemField'
+      'addProjectV2ItemById',
+      'updateProjectV2ItemFieldValue',
+      'updateProjectV2ItemFieldValue'
     ]);
   });
 
