@@ -2,6 +2,8 @@ import { Octokit } from "@octokit/core";
 import type { GraphQlQueryResponseData } from "@octokit/graphql";
 import {isDryRun} from "./utils";
 
+import { Milestone } from "@octokit/webhooks-types"
+
 // gh api graphql -f query='
 //   query {
 //     organization(login: "neondatabase"){
@@ -42,14 +44,6 @@ const FIELDS_IDS_BY_PROJECT = {
     trackedIn: "PVTF_lADOBKF3Cs4AMKWTzgHwfhM",
     progress: "PVTF_lADOBKF3Cs4AMKWTzgHwfhU",
   }
-}
-
-interface Milestone {
-  id: number;
-  node_id: string;
-  dueOn: string;
-  number: any;
-  title?: string;
 }
 
 interface IssueData {
@@ -152,6 +146,7 @@ export class Issue {
   // subtasks are markdown list entries in the body
   private setSubtasks() {
     this.subtasks = Array
+      // @ts-ignore
       .from(this.body.matchAll(/[-|*] \[([ x])\] ([^\n]*)/g))
       .map((m: any) => {
         let closed = m[1] === 'x';

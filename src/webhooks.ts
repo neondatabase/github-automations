@@ -23,6 +23,18 @@ export = (app: Probot) => {
   const milestoneQueue = new Queue(1);
   const notificationsQueue = new Queue(1);
 
+  // @ts-ignore
+  // app.on(["projects_v2_item.edited"], async (context) => {
+  //   console.log("context: ", context);
+  //
+  //   // @ts-ignore
+  //   if (context.payload.projects_v2_item.content_type === 'Issue') {
+  //     // @ts-ignore
+  //     let issue = await Issue.load(context.octokit, context.payload.projects_v2_item.content_node_id);
+  //     console.log(issue.subtasks);
+  //   }
+  // });
+
   app.on(["issues.opened", "issues.edited"], async (context) => {
     // console.log("issues.opened: ", context.payload);
 
@@ -31,7 +43,7 @@ export = (app: Probot) => {
     await issue.addToTheProject(context.octokit);
     await issue.addChildrenToTheProject(context.octokit)
   });
-
+  //
   app.on(["issues.demilestoned", "issues.milestoned"], async (context) => {
     console.log(`issue ${context.payload.issue.node_id} ${context.payload.action}`);
 
@@ -52,29 +64,15 @@ export = (app: Probot) => {
       if (context.payload.action === "demilestoned") {
         // github events `issue.milestoned` and `issue.demilestoned` contains
         // field `payload.milestone`, but for some reason typings doesn't have it
-        // @ts-ignore
         prevMilestone = context.payload.milestone;
       } else if (context.payload.action === "milestoned") {
-        // @ts-ignore
         nextMilestone = context.payload.milestone;
       } else {
         return;
       }
 
       let issue = await Issue.load(context.octokit, context.payload.issue.node_id);
-      await issue.syncChildrenMilestone(context.octokit, prevMilestone ? {
-        id: prevMilestone.id,
-        node_id: prevMilestone.node_id,
-        dueOn: prevMilestone.due_on,
-        number: prevMilestone.number,
-        title: prevMilestone.title,
-      } : null, nextMilestone ? {
-        id: nextMilestone.id,
-        node_id: nextMilestone.node_id,
-        dueOn: nextMilestone.due_on,
-        number: nextMilestone.number,
-        title: nextMilestone.title,
-      } : null);
+      await issue.syncChildrenMilestone(context.octokit, prevMilestone, nextMilestone);
     });
   });
 
@@ -86,7 +84,7 @@ export = (app: Probot) => {
     PROpenedHandler(context)
   });
 
-  app.on(["pull_request.merged", "pull_request.closed"], async (context) => {
+  app.on(["pull_request.closed"], async (context) => {
     PRMergedOrClosedHandler(context)
   });
 
