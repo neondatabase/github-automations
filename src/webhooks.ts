@@ -14,11 +14,8 @@ import {
   PRMergedOrClosedHandler, PROpenedHandler,
   PRUnLabeledHandler
 } from "./deploy_preview_label_handler";
-import {
-  // CONSOLE, ENGINEERING,
-  NEON_PRIVATE_ROADMAP,
-} from "./project_ids";
-import {syncRoadmapTargetFieldsWithEngProjects} from "./sync_roadmap_changes_with_eng_projects";
+
+import * as listeners from "./modules";
 
 // webhooks entry point to the probot app
 export = (app: Probot) => {
@@ -28,14 +25,7 @@ export = (app: Probot) => {
   const milestoneQueue = new Queue(1);
   const notificationsQueue = new Queue(1);
 
-  app.on(["projects_v2_item.edited"], async (context) => {
-    console.log("context: ", context);
-    // we only update fields on edited because when projectItem is created it has no fields, so nothing to update
-    if (context.payload.projects_v2_item.project_node_id === NEON_PRIVATE_ROADMAP.projectId) {
-      // populate target ship Month and quarter for subtasks from engineering and console projects
-      await syncRoadmapTargetFieldsWithEngProjects(context);
-    }
-  });
+  listeners.sync_roadmap_ship_target_with_subtasks_listener(app);
 
   app.on(["issues.opened", "issues.edited"], async (context) => {
     // console.log("issues.opened: ", context.payload);
