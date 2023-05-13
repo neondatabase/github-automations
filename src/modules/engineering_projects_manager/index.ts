@@ -1,5 +1,5 @@
 import {Probot} from "probot";
-import {Issue} from "../../shared/issue_next";
+import {Issue} from "../../shared/issue";
 import {CONSOLE, ENGINEERING} from "../../project_ids";
 import {Octokit} from "@octokit/core";
 

@@ -2,7 +2,7 @@ import {Context} from "probot/lib/context";
 import {EmitterWebhookEvent, EmitterWebhookEventName, } from "@octokit/webhooks";
 
 import {CONSOLE, NEON_PRIVATE_ROADMAP} from "../../project_ids";
-import {Issue} from "../../shared/issue_next";
+import {Issue} from "../../shared/issue";
 import {Octokit} from "@octokit/core";
 import {isDryRun} from "../../shared/utils";
 import {projectV2ItemByNodeId} from "../../graphql_queries";
