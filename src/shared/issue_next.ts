@@ -146,8 +146,14 @@ export class Issue {
       )
   }
 
-  trackedIn() {
+  async trackedIn(kit: Octokit, projectId: string) {
+    for (const parent of this.parents) {
+      await parent.loadConnectedProjectItems(kit);
+    }
+
     return this.parents
+      // only issues that are belong to the same project
+      .filter((p: Issue) => (!!p.connectedProjectItems[projectId]))
       .map((p: Issue) =>
         `${p.title} (https://github.com/${p.repo_full_name}/issues/${p.number})`
       )

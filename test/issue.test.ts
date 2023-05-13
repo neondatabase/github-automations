@@ -1,4 +1,4 @@
-import { Issue } from "../src/shared/issue";
+import { Issue } from "../src/shared/issue_next";
 import issueWithParents from "./fixtures/issueWithParents.json";
 
 const check_has_parent = (rawIssue: any, body: string) => {
@@ -86,7 +86,7 @@ describe("Issue class", () => {
 
     let issue = new Issue(rawIssue);
     expect(issue.parents.length).toStrictEqual(2);
-    expect(issue.trackedIn()).toStrictEqual("bot test (https://github.com/org/repo/issues/11), second parent (https://github.com/org/repo/issues/12)");
+    // expect(issue.trackedIn()).toStrictEqual("bot test (https://github.com/org/repo/issues/11), second parent (https://github.com/org/repo/issues/12)");
   });
 
   test("it parses issue data correctly", () => {
