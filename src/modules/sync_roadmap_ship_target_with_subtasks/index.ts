@@ -1,4 +1,4 @@
-import {NEON_PRIVATE_ROADMAP} from "../../project_ids";
+import {NEON_PRIVATE_ROADMAP} from "../../shared/project_ids";
 import {
   handleRoadmapIssueChange,
   handleRoadmapProjectItemChange

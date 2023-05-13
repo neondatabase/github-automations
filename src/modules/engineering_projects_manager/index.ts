@@ -1,6 +1,6 @@
 import {Probot} from "probot";
 import {Issue} from "../../shared/issue";
-import {CONSOLE, ENGINEERING} from "../../project_ids";
+import {CONSOLE, ENGINEERING} from "../../shared/project_ids";
 import {Octokit} from "@octokit/core";
 
 const FIELD_IDS_BY_PROJECT_ID = {

@@ -16,4 +16,6 @@ export const ENGINEERING = {
   projectId: 'PVT_kwDOBKF3Cs1e-g',
   trackedInFieldId: 'PVTF_lADOBKF3Cs1e-s4AB3Qt',
   progressFieldId: 'PVTF_lADOBKF3Cs1e-s4ADvDB',
+  roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs1e-s4Ck_92',
+  roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs1e-s4Ck_-L',
 };
