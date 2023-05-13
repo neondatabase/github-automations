@@ -136,6 +136,7 @@ query($id: ID!){
         ... on ProjectV2ItemConnection {
           nodes {
             ... on ProjectV2Item {
+              id,
               project {
                 ... on ProjectV2 {
                   id, title
