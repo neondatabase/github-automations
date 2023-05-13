@@ -1,56 +1,14 @@
 import { Octokit } from "@octokit/core";
 import type { GraphQlQueryResponseData } from "@octokit/graphql";
-import {isDryRun} from "./utils";
+import { isDryRun } from "./utils";
 
-// gh api graphql -f query='
-//   query {
-//     organization(login: "neondatabase"){
-//       projectV2(number: 6) {
-//           id
-//       }
-//     }
-//   }'
-const PROJECT_ID = 'PVT_kwDOBKF3Cs1e-g'
-
-// gh api graphql -f query='
-// query{
-//   node(id: "PVT_kwDOBKF3Cs1e-g") {
-//   ... on ProjectV2 {
-//       fields(first: 20) {
-//         nodes {
-//         ... on ProjectV2Field {
-//             name,
-//               id
-//           }
-//         },
-//         totalCount
-//       }
-//     }
-//   }
-// }'
-const TRACKED_IN_FIELD_ID = 'PVTF_lADOBKF3Cs1e-s4AB3Qt'
-const PROGRESS_FIELD_ID = 'PVTF_lADOBKF3Cs1e-s4ADvDB'
-
-const CONSOLE_TASKS_PROJECT_ID = "PVT_kwDOBKF3Cs4AMKWT";
-
-const FIELDS_IDS_BY_PROJECT = {
-  [PROJECT_ID]: {
-    trackedIn: TRACKED_IN_FIELD_ID,
-    progress: PROGRESS_FIELD_ID,
-  },
-  [CONSOLE_TASKS_PROJECT_ID]: {
-    trackedIn: "PVTF_lADOBKF3Cs4AMKWTzgHwfhM",
-    progress: "PVTF_lADOBKF3Cs4AMKWTzgHwfhU",
-  }
-}
-
-interface Milestone {
-  id: number;
-  node_id: string;
-  dueOn: string;
-  number: any;
-  title?: string;
-}
+import { Milestone } from "@octokit/webhooks-types"
+import {
+  issueProjectV2Items,
+  issueWithParents,
+  setField
+} from "./graphql_queries";
+import {logger} from "./logger";
 
 interface IssueData {
   repo: string;
@@ -65,6 +23,7 @@ export class Issue {
   number: number;
   repo_full_name: string;
   repo_name: string;
+  // [closed, label, IssueData]
   subtasks: Array<[boolean, string, IssueData | undefined]>;
   owner_login: string;
   milestone?: Milestone;
@@ -72,6 +31,12 @@ export class Issue {
 
   mentions: Array<Issue>;
   parents: Array<Issue>;
+
+  consoleProjectNodeId?: string;
+  engineeringProjectNodeId?: string;
+
+  // {[projectId]: [nodeId]}
+  connectedProjectItems: Record<string, string>
 
   constructor(node: any) {
     this.node_id = node.id;
@@ -87,6 +52,8 @@ export class Issue {
     this.owner_login = node.repository.owner.login;
     this.milestone = node.milestone;
     this.belongsToConsole = !!(node.labels?.nodes || []).find((l: any) => (l.name === 'c/console/ui'));
+
+    this.connectedProjectItems = {};
 
 
     // fill children
@@ -110,9 +77,10 @@ export class Issue {
     let resp: GraphQlQueryResponseData = await kit.graphql(issueWithParents, {
       issue_id: issueNodeId,
     });
-    console.log(resp);
+    logger(resp);
     let issue = new Issue(resp.node);
-    console.log("new ZenithIssue object: ", issue);
+    await issue.loadConnectedProjectItems(kit);
+    logger("new ZenithIssue object: ", issue);
     return issue;
   }
 
@@ -152,6 +120,7 @@ export class Issue {
   // subtasks are markdown list entries in the body
   private setSubtasks() {
     this.subtasks = Array
+      // @ts-ignore
       .from(this.body.matchAll(/[-|*] \[([ x])\] ([^\n]*)/g))
       .map((m: any) => {
         let closed = m[1] === 'x';
@@ -177,8 +146,14 @@ export class Issue {
       )
   }
 
-  trackedIn() {
+  async trackedIn(kit: Octokit, projectId: string) {
+    for (const parent of this.parents) {
+      await parent.loadConnectedProjectItems(kit);
+    }
+
     return this.parents
+      // only issues that are belong to the same project
+      .filter((p: Issue) => (!!p.connectedProjectItems[projectId]))
       .map((p: Issue) =>
         `${p.title} (https://github.com/${p.repo_full_name}/issues/${p.number})`
       )
@@ -196,110 +171,80 @@ export class Issue {
     }
   }
 
-  async addToTheProject(kit: Octokit) {
-    // upsert to the project
-    let resp: GraphQlQueryResponseData = await kit.graphql(addToTheProject, {
-      issue_id: this.node_id,
-      project_id: PROJECT_ID,
+  private async loadConnectedProjectItems(kit: Octokit) {
+    logger("loading connections for issue,", this.node_id);
+    // get info about connected project items
+    const resp: GraphQlQueryResponseData = await kit.graphql(issueProjectV2Items, {
+      id: this.node_id,
     });
-    console.log("added to the Engineering project: ", resp);
 
-    let project_item_id: string = resp.addProjectV2ItemById.item.id;
-    let console_project_item_id: string = ''
+    logger('loaded connections: ', resp);
+    const {node} = resp;
 
-    if (this.belongsToConsole) {
-      resp = await kit.graphql(addToTheProject, {
-        issue_id: this.node_id,
-        project_id: CONSOLE_TASKS_PROJECT_ID,
-      });
-      console.log("added to the Console Project: ", resp);
-      console_project_item_id = resp.addProjectV2ItemById.item.id;
-    }
-
-
-    // set tracked_in field
-    if (!isDryRun()) {
-      console.log("set tracked in for", this.title);
-      const trackedInVal = this.trackedIn();
-
-      resp = await kit.graphql(setField, {
-        project_id: PROJECT_ID,
-        project_item_id: project_item_id,
-        tracked_field_id: TRACKED_IN_FIELD_ID,
-        value: trackedInVal,
-      });
-
-      if (console_project_item_id) {
-        resp = await kit.graphql(setField, {
-          project_id: CONSOLE_TASKS_PROJECT_ID,
-          project_item_id: console_project_item_id,
-          tracked_field_id: FIELDS_IDS_BY_PROJECT[CONSOLE_TASKS_PROJECT_ID].trackedIn,
-          value: trackedInVal,
-        });
-      }
-    }
-    console.log("setTrackedIn: ", resp);
-
-    // set progress field
-    if (!isDryRun()) {
-      const progressVal = this.progress();
-
-      resp = await kit.graphql(setField, {
-        project_id: PROJECT_ID,
-        project_item_id: project_item_id,
-        tracked_field_id: PROGRESS_FIELD_ID,
-        value: progressVal,
-      });
-
-      if (console_project_item_id) {
-        resp = await kit.graphql(setField, {
-          project_id: CONSOLE_TASKS_PROJECT_ID,
-          project_item_id: console_project_item_id,
-          tracked_field_id: FIELDS_IDS_BY_PROJECT[CONSOLE_TASKS_PROJECT_ID].progress,
-          value: progressVal,
-        });
-      }
-    }
-    console.log("setProgressField: ", resp);
-
-    if (this.milestone && this.subtasks.length > 0) {
-      // set milestone field for child issues
-      await this.syncChildrenMilestone(kit, this.milestone, this.milestone);
-    }
-  }
-
-  async addChildrenToTheProject(kit: Octokit) {
-    console.log(`syncChildrenTrackedIn: ${this.title}`);
-    if (!this.subtasks.length) {
-      console.log(`skip because no subtasks`);
+    if (!node || !node.projectItems || !node.projectItems.nodes || !node.projectItems.nodes.length) {
       return;
     }
 
+    for (const item of node.projectItems.nodes) {
+      this.connectedProjectItems[item.project.id] = item.id;
+    }
+    logger("done loading connections, result:", this.connectedProjectItems);
+  }
 
+  async setFieldValue(kit: Octokit, projectId: string, fieldId: string, value: any) {
+    logger("start setFieldValue", this)
+    if (!this.connectedProjectItems[projectId]) {
+      // issue doesn't not belong to this project
+      logger("skipping because does not belong to project", this.title)
+      return;
+    }
+
+    if (!isDryRun()) {
+      const resp = await kit.graphql(setField, {
+        project_id: projectId,
+        project_item_id: this.connectedProjectItems[projectId],
+        tracked_field_id: fieldId,
+        value,
+      });
+      logger('resp: ', resp)
+    }
+    logger("updated value for", this.title)
+
+  }
+
+  async getChildrenIssues(kit: Octokit) {
+    logger(`getChildrenIssues: ${this.title}`);
+    if (!this.subtasks.length) {
+      logger(`skip because no subtasks`);
+      return [];
+    }
+
+    const res: Issue[] = [];
     for (let [closed, , issueData] of this.subtasks) {
       if (closed || !issueData) {
         continue;
       }
 
-      console.log(`processing ${issueData.repo}#${issueData.number}`);
+      logger(`processing ${issueData.repo}#${issueData.number}`);
       let {data: issue} = await kit.request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
         owner: this.owner_login,
         repo: issueData.repo,
         issue_number: issueData.number,
       });
 
-      console.log(`process ${issue.id}`, issue);
-
+      logger(`process ${issue.id}`, issue);
       const zIssue = await Issue.load(kit, issue.node_id);
-      await zIssue.addToTheProject(kit);
-      console.log(`done processing ${issue.title}`);
+      res.push(zIssue);
+      logger(`done processing ${issue.title}`);
     }
+
+    return res;
   }
 
-  async syncChildrenMilestone(kit: Octokit, oldMilestone: Milestone | null, newMilestone: Milestone | null) {
+  async syncChildrenMilestone(kit: Octokit, oldMilestone: Milestone | null, newMilestone: Milestone | null) { // todo
     if (this.subtasks.length) {
-      console.log('sync children milestone, from:', oldMilestone);
-      console.log('sync children milestone, to:', newMilestone);
+      logger('sync children milestone, from:', oldMilestone);
+      logger('sync children milestone, to:', newMilestone);
     }
     const milestoneMap: Record<string, number> = {};
     // sync milestones for children
@@ -308,13 +253,13 @@ export class Issue {
 
       // don't update closed subtasks
       if (_closed || !issueData) {
-        console.log(`skip "${title}" because it's closed or couldn't be parsed`);
+        logger(`skip "${title}" because it's closed or couldn't be parsed`);
         continue;
       }
 
       const {repo, number: issue_number} = issueData;
 
-      console.log(`processing ${repo}#${issue_number}`);
+      logger(`processing ${repo}#${issue_number}`);
       let {data: issue} = await kit.request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
         owner: this.owner_login,
         repo,
@@ -325,7 +270,7 @@ export class Issue {
         (issue.milestone && !oldMilestone) ||
         (issue.milestone && oldMilestone && issue.milestone.title !== oldMilestone.title)
       ) {
-        console.log(`skip ${repo}#${issue_number} because it didn't match the old milestone: issue milestone: ${issue.milestone?.number}, old milestone: ${oldMilestone?.number}`);
+        logger(`skip ${repo}#${issue_number} because it didn't match the old milestone: issue milestone: ${issue.milestone?.number}, old milestone: ${oldMilestone?.number}`);
 
         continue;
       }
@@ -362,93 +307,7 @@ export class Issue {
         });
       }
 
-      console.log(`set issue #${repo}/${issue_number} milestone to`, milestoneNumber);
+      logger(`set issue #${repo}/${issue_number} milestone to`, milestoneNumber);
     }
   }
-
 }
-
-const issueWithParents = `
-    query($issue_id: ID!) {
-      node(id: $issue_id) {
-        id
-        ... on Issue {
-          id
-          title
-          body
-          number
-          milestone {
-            id
-            dueOn
-            number
-            title
-          }
-          repository {
-            nameWithOwner
-            name
-            owner {
-              login
-            }
-          }
-          labels(last: 100) {
-            nodes {
-              id
-              name
-            }
-          }
-          timelineItems(last: 100) {
-            nodes {
-              ... on CrossReferencedEvent {
-                id
-                source {
-                  ... on Issue {
-                    id
-                    title
-                    body
-                    number
-                    milestone {
-                      id
-                      dueOn
-                      number
-                      title
-                    }
-                    repository {
-                      nameWithOwner
-                      name
-                      owner {
-                        login
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  `
-
-const addToTheProject = `
-    mutation ($project_id: ID!, $issue_id: ID!) {
-      addProjectV2ItemById(input: {
-        projectId: $project_id,
-        contentId: $issue_id
-      }) {
-      item { id }
-      }
-    }
-  `;
-
-const setField = `
-    mutation ($project_id: ID!, $project_item_id: ID!, $tracked_field_id: ID!, $value: String!) {
-      updateProjectV2ItemFieldValue(input: {
-        projectId: $project_id,
-        itemId: $project_item_id,
-        fieldId: $tracked_field_id,
-        value: { text: $value }
-      }) {
-        projectV2Item { id }
-      }
-    }
-  `;

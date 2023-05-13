@@ -1,4 +1,4 @@
-import { EventPayloads, WebhookEvent } from "@octokit/webhooks";
+import {EmitterWebhookEvent, EmitterWebhookEventName} from "@octokit/webhooks"
 import { Context } from "probot/lib/context";
 
 const FREE = "BFBFBF";
@@ -18,7 +18,7 @@ const COLORS: Record<string, string> = {
   chlorine: "a7ab57",
 }
 
-export const PRLabeledHandler = async (context: WebhookEvent<EventPayloads.WebhookPayloadPullRequest> & Omit<Context<any>, keyof WebhookEvent<any>>) => {
+export const PRLabeledHandler = async (context: EmitterWebhookEvent<"pull_request.labeled"> & Omit<Context<EmitterWebhookEventName>, "id" | "name" | "payload">) => {
   if (context.payload.repository.full_name !== "neondatabase/cloud" ||
     context.payload.sender.type === 'Bot') {
     return;
@@ -67,7 +67,7 @@ export const PRLabeledHandler = async (context: WebhookEvent<EventPayloads.Webho
   });
 }
 
-export const PRUnLabeledHandler = async (context: WebhookEvent<EventPayloads.WebhookPayloadPullRequest> & Omit<Context<any>, keyof WebhookEvent<any>>) => {
+export const PRUnLabeledHandler = async (context: EmitterWebhookEvent<"pull_request.unlabeled"> & Omit<Context<EmitterWebhookEventName>, "id" | "name" | "payload">) => {
   if (context.payload.repository.full_name !== "neondatabase/cloud" ||
     context.payload.sender.type === 'Bot') {
     return;
@@ -94,7 +94,7 @@ export const PRUnLabeledHandler = async (context: WebhookEvent<EventPayloads.Web
   });
 }
 
-export const PRMergedOrClosedHandler = async (context: WebhookEvent<EventPayloads.WebhookPayloadPullRequest> & Omit<Context<any>, keyof WebhookEvent<any>>) => {
+export const PRMergedOrClosedHandler = async (context: EmitterWebhookEvent<"pull_request.closed"> & Omit<Context<EmitterWebhookEventName>, "id" | "name" | "payload">) => {
   if (context.payload.repository.full_name !== "neondatabase/cloud" ||
     context.payload.sender.type === 'Bot') {
     return;
@@ -130,7 +130,7 @@ export const PRMergedOrClosedHandler = async (context: WebhookEvent<EventPayload
   });
 }
 
-export const PROpenedHandler = async (context: WebhookEvent<EventPayloads.WebhookPayloadPullRequest> & Omit<Context<any>, keyof WebhookEvent<any>>) => {
+export const PROpenedHandler = async (context: EmitterWebhookEvent<"pull_request.opened"> & Omit<Context<EmitterWebhookEventName>, "id" | "name" | "payload">) => {
   if (context.payload.repository.full_name !== "neondatabase/cloud" ||
     context.payload.sender.type === 'Bot') {
     return;
