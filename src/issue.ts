@@ -3,46 +3,24 @@ import type { GraphQlQueryResponseData } from "@octokit/graphql";
 import {isDryRun} from "./utils";
 
 import { Milestone } from "@octokit/webhooks-types"
+import {CONSOLE, ENGINEERING} from "./project_ids";
+import {addToTheProject, issueWithParents, setField} from "./graphql_queries";
 
-// gh api graphql -f query='
-//   query {
-//     organization(login: "neondatabase"){
-//       projectV2(number: 6) {
-//           id
-//       }
-//     }
-//   }'
-const PROJECT_ID = 'PVT_kwDOBKF3Cs1e-g'
+const PROJECT_ID = ENGINEERING.projectId;
 
-// gh api graphql -f query='
-// query{
-//   node(id: "PVT_kwDOBKF3Cs1e-g") {
-//   ... on ProjectV2 {
-//       fields(first: 20) {
-//         nodes {
-//         ... on ProjectV2Field {
-//             name,
-//               id
-//           }
-//         },
-//         totalCount
-//       }
-//     }
-//   }
-// }'
-const TRACKED_IN_FIELD_ID = 'PVTF_lADOBKF3Cs1e-s4AB3Qt'
-const PROGRESS_FIELD_ID = 'PVTF_lADOBKF3Cs1e-s4ADvDB'
+const TRACKED_IN_FIELD_ID = ENGINEERING.trackedInFieldId
+const PROGRESS_FIELD_ID = ENGINEERING.progressFieldId
 
-const CONSOLE_TASKS_PROJECT_ID = "PVT_kwDOBKF3Cs4AMKWT";
+const CONSOLE_TASKS_PROJECT_ID = CONSOLE.projectId;
 
 const FIELDS_IDS_BY_PROJECT = {
   [PROJECT_ID]: {
-    trackedIn: TRACKED_IN_FIELD_ID,
-    progress: PROGRESS_FIELD_ID,
+    trackedIn: ENGINEERING.trackedInFieldId,
+    progress: ENGINEERING.progressFieldId,
   },
   [CONSOLE_TASKS_PROJECT_ID]: {
-    trackedIn: "PVTF_lADOBKF3Cs4AMKWTzgHwfhM",
-    progress: "PVTF_lADOBKF3Cs4AMKWTzgHwfhU",
+    trackedIn: CONSOLE.trackedInFieldId,
+    progress: CONSOLE.progressFieldId,
   }
 }
 
@@ -360,90 +338,4 @@ export class Issue {
       console.log(`set issue #${repo}/${issue_number} milestone to`, milestoneNumber);
     }
   }
-
 }
-
-const issueWithParents = `
-    query($issue_id: ID!) {
-      node(id: $issue_id) {
-        id
-        ... on Issue {
-          id
-          title
-          body
-          number
-          milestone {
-            id
-            dueOn
-            number
-            title
-          }
-          repository {
-            nameWithOwner
-            name
-            owner {
-              login
-            }
-          }
-          labels(last: 100) {
-            nodes {
-              id
-              name
-            }
-          }
-          timelineItems(last: 100) {
-            nodes {
-              ... on CrossReferencedEvent {
-                id
-                source {
-                  ... on Issue {
-                    id
-                    title
-                    body
-                    number
-                    milestone {
-                      id
-                      dueOn
-                      number
-                      title
-                    }
-                    repository {
-                      nameWithOwner
-                      name
-                      owner {
-                        login
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  `
-
-const addToTheProject = `
-    mutation ($project_id: ID!, $issue_id: ID!) {
-      addProjectV2ItemById(input: {
-        projectId: $project_id,
-        contentId: $issue_id
-      }) {
-      item { id }
-      }
-    }
-  `;
-
-const setField = `
-    mutation ($project_id: ID!, $project_item_id: ID!, $tracked_field_id: ID!, $value: String!) {
-      updateProjectV2ItemFieldValue(input: {
-        projectId: $project_id,
-        itemId: $project_item_id,
-        fieldId: $tracked_field_id,
-        value: { text: $value }
-      }) {
-        projectV2Item { id }
-      }
-    }
-  `;
