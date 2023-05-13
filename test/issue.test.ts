@@ -1,4 +1,4 @@
-import { Issue } from "../src/lib/issue";
+import { Issue } from "../src/shared/issue";
 import issueWithParents from "./fixtures/issueWithParents.json";
 
 const check_has_parent = (rawIssue: any, body: string) => {

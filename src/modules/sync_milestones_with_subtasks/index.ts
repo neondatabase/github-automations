@@ -1,6 +1,6 @@
 import {Probot} from "probot";
-import {sleep} from "../../lib/utils";
-import {Issue} from "../../lib/issue";
+import {sleep} from "../../shared/utils";
+import {Issue} from "../../shared/issue";
 import Queue from "async-await-queue";
 
 export const sync_milestones_with_subtasks_listener = (app: Probot) => {

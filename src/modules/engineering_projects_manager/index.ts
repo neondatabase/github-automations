@@ -1,5 +1,5 @@
 import {Probot} from "probot";
-import {Issue} from "../../lib/issue";
+import {Issue} from "../../shared/issue";
 
 export const engineering_projects_manager_listener = (app: Probot) => {
   app.on(["issues.opened", "issues.edited"], async (context) => {
