@@ -7,7 +7,7 @@ import {
   issueProjectV2Items,
   issueWithParents,
   setField
-} from "../graphql_queries";
+} from "./graphql_queries";
 import {logger} from "./logger";
 
 interface IssueData {

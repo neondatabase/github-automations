@@ -5,7 +5,7 @@ import {CONSOLE, NEON_PRIVATE_ROADMAP} from "../../project_ids";
 import {Issue} from "../../shared/issue";
 import {Octokit} from "@octokit/core";
 import {isDryRun} from "../../shared/utils";
-import {projectV2ItemByNodeId} from "../../graphql_queries";
+import {projectV2ItemByNodeId} from "../../shared/graphql_queries";
 import {logger} from "../../shared/logger";
 
 const FIELDS_MAPPING = [
