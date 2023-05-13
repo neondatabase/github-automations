@@ -58,7 +58,7 @@ const syncFieldValuesWithSubtasks = async (kit: Octokit, roadmapNodeId: string, 
   })
 }
 
-export const syncRoadmapTargetFieldsWithEngProjects = async (context: EmitterWebhookEvent<"projects_v2_item.edited"> & Omit<Context<EmitterWebhookEventName>, "id" | "name" | "payload">) => {
+export const handleRoadmapProjectItemChange = async (context: EmitterWebhookEvent<"projects_v2_item.edited"> & Omit<Context<EmitterWebhookEventName>, "id" | "name" | "payload">) => {
   // check all the children in Engineering and Console projects
   // and sync Target Month and Target Quarter fields
   // from Roadmap Project item to Engineering and Console projects
@@ -83,5 +83,19 @@ export const syncRoadmapTargetFieldsWithEngProjects = async (context: EmitterWeb
     context.payload.projects_v2_item.node_id,
     childrenIssues,
     mapping,
+  )
+}
+
+export const handleRoadmapIssueChange = async (context: EmitterWebhookEvent<"issues.edited"> & Omit<Context<EmitterWebhookEventName>, "id" | "name" | "payload">) => {
+  const issue = await Issue.load(context.octokit, context.payload.issue.node_id);
+  const childrenIssues = await issue.getChildrenIssues(context.octokit);
+  if (!issue.connectedProjectItems[NEON_PRIVATE_ROADMAP.projectId]) {
+    return;
+  }
+  await syncFieldValuesWithSubtasks(
+    context.octokit,
+    issue.connectedProjectItems[NEON_PRIVATE_ROADMAP.projectId],
+    childrenIssues,
+    FIELDS_MAPPING,
   )
 }
