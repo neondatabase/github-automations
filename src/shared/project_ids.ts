@@ -19,3 +19,8 @@ export const ENGINEERING = {
   roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs1e-s4Ck_92',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs1e-s4Ck_-L',
 };
+
+export const PRODUCT_DESIGN = {
+  projectId: 'PVT_kwDOBKF3Cs4AL_Xj',
+  roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AL_XjzgKe_xI',
+};
