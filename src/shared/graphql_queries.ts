@@ -1,30 +1,22 @@
-
-// gh api graphql -f query='
-//   query {
-//     organization(login: "neondatabase"){
-//       projectV2(number: 6) {
-//           id
-//       }
-//     }
-//   }'
+// get project fields list with ids
 
 // gh api graphql -f query='
 // query{
-//   node(id: "PVT_kwDOBKF3Cs1e-g") {
-//   ... on ProjectV2 {
-//       fields(first: 20) {
+//   organization(login: "neondatabase"){
+//     projectV2(number: 17) {
+//       id,
+//         title,
+//         fields(first: 100) {
 //         nodes {
 //         ... on ProjectV2Field {
-//             name,
-//               id
+//             id,
+//               name
 //           }
-//         },
-//         totalCount
+//         }
 //       }
 //     }
 //   }
-// }
-// '
+// }'
 
 export const issueWithParents = `
     query($issue_id: ID!) {
