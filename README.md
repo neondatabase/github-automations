@@ -19,7 +19,7 @@ The bot is also responsible for deploy notifications, so make sure to configure 
 
 ## Scripts
 
-`./sync_issues.rb` -- walks over all open issues in console and zeniths repos and add them to https://github.com/orgs/zenithdb/projects/6. Also sets `Tracked In` field if current issue is subtask of some other issue.
+`./sync_issues.rb` -- walks over all open issues in cloud and neon repos and add them to https://github.com/orgs/neondatabase/projects/6. Also sets `Tracked In` field if current issue is subtask of some other issue.
 
 Tested with ruby 2.7.3 but expected to work all 2.x/3.x versions.
 
