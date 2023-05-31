@@ -24,3 +24,8 @@ export const PRODUCT_DESIGN = {
   projectId: 'PVT_kwDOBKF3Cs4AL_Xj',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AL_XjzgKe_xI',
 };
+
+export const INFRA = {
+  projectId: 'PVT_kwDOBKF3Cs4AQhn_',
+  roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4AQhn_zgKjQLQ',
+}
