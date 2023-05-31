@@ -192,7 +192,9 @@ export class Issue {
   }
 
   async setFieldValue(kit: Octokit, projectId: string, fieldId: string, value: any) {
-    logger("start setFieldValue", this)
+    logger("start setFieldValue epic:", this.title)
+    logger("start setFieldValue fieldId:", fieldId)
+    logger("start setFieldValue value:", value)
     if (!this.connectedProjectItems[projectId]) {
       // issue doesn't not belong to this project
       logger("skipping because does not belong to project", this.title)

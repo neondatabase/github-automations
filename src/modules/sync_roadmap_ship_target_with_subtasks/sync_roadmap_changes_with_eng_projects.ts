@@ -1,7 +1,13 @@
 import {Context} from "probot/lib/context";
 import {EmitterWebhookEvent, EmitterWebhookEventName, } from "@octokit/webhooks";
 
-import {CONSOLE, ENGINEERING, NEON_PRIVATE_ROADMAP, PRODUCT_DESIGN} from "../../shared/project_ids";
+import {
+  CONSOLE,
+  ENGINEERING,
+  INFRA,
+  NEON_PRIVATE_ROADMAP,
+  PRODUCT_DESIGN
+} from "../../shared/project_ids";
 import {Issue} from "../../shared/issue";
 import {Octokit} from "@octokit/core";
 import {isDryRun} from "../../shared/utils";
@@ -19,6 +25,10 @@ const FIELDS_MAPPING = [
       {
         projectId: ENGINEERING.projectId,
         fieldId: ENGINEERING.roadmapTargetShipMonthFieldId,
+      },
+      {
+        projectId: INFRA.projectId,
+        fieldId: INFRA.roadmapTargetShipMonthFieldId,
       }
     ]
   },
@@ -79,9 +89,11 @@ export const handleRoadmapProjectItemChange = async (context: EmitterWebhookEven
     return;
   }
 
-  const mapping = FIELDS_MAPPING.filter(item => item.from === context.payload.changes.field_value.field_node_id);
+  const mapping = context.payload.changes.field_value.field_node_id === NEON_PRIVATE_ROADMAP.forceSyncFieldId
+    ? FIELDS_MAPPING
+    : FIELDS_MAPPING.filter(item => item.from === context.payload.changes.field_value.field_node_id);
 
-  logger("changes", context.payload.changes)
+  // logger("changes", context.payload.changes)
   logger("All mapping", FIELDS_MAPPING)
   logger("will apply mapping", mapping)
   if (!mapping.length) {

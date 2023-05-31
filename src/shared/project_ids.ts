@@ -2,6 +2,7 @@ export const NEON_PRIVATE_ROADMAP = {
   projectId: "PVT_kwDOBKF3Cs4ADWZl",
   targetShipMothFieldId: "PVTIF_lADOBKF3Cs4ADWZlzgB7V1c",
   targetShipQuarterFieldId: "PVTIF_lADOBKF3Cs4ADWZlzgJK-lA",
+  forceSyncFieldId: 'PVTF_lADOBKF3Cs4ADWZlzgKz5cA',
 };
 
 export const CONSOLE = {
