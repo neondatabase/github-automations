@@ -49,3 +49,10 @@ export const CONTROL_PLANE = {
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4ASIxLzgLlRoA',
   roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4ASIxLzgLlRn8',
 }
+
+// project id: 14
+export const DATA = {
+  projectId: 'PVT_kwDOBKF3Cs4ALGJW',
+  roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4ALGJWzgL3Pu8',
+  roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4ALGJWzgL3PuQ',
+}
