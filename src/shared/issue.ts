@@ -78,6 +78,10 @@ export class Issue {
       issue_id: issueNodeId,
     });
     logger(resp);
+    if (!resp.node) {
+      logger("failed to parse issue", resp)
+      throw new Error("failed to parse issue");
+    }
     let issue = new Issue(resp.node);
     await issue.loadConnectedProjectItems(kit);
     logger("new ZenithIssue object: ", issue);
@@ -240,9 +244,13 @@ export class Issue {
       });
 
       logger(`process ${issue.id}`, issue);
-      const zIssue = await Issue.load(kit, issue.node_id);
-      res.push(zIssue);
-      logger(`done processing ${issue.title}`);
+      try {
+        const zIssue = await Issue.load(kit, issue.node_id);
+        res.push(zIssue);
+        logger(`done processing ${issue.title}`);
+      } catch(e) {
+        logger(e)
+      }
     }
 
     return res;

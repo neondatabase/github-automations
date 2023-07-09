@@ -169,26 +169,34 @@ export const handleRoadmapProjectItemChange = async (context: EmitterWebhookEven
     logger("skipping because nothing to map")
   }
 
-  const issue = await Issue.load(context.octokit, context.payload.projects_v2_item.content_node_id);
-  const childrenIssues = await issue.getChildrenIssues(context.octokit);
-  await syncFieldValuesWithSubtasks(
-    context.octokit,
-    context.payload.projects_v2_item.node_id,
-    childrenIssues,
-    mapping,
-  )
+  try {
+    const issue = await Issue.load(context.octokit, context.payload.projects_v2_item.content_node_id);
+    const childrenIssues = await issue.getChildrenIssues(context.octokit);
+    await syncFieldValuesWithSubtasks(
+      context.octokit,
+      context.payload.projects_v2_item.node_id,
+      childrenIssues,
+      mapping,
+    )
+  } catch(e) {
+    logger('Failed to sync fields with subtask ')
+  }
 }
 
 export const handleRoadmapIssueChange = async (context: EmitterWebhookEvent<"issues.edited"> & Omit<Context<EmitterWebhookEventName>, "id" | "name" | "payload">) => {
-  const issue = await Issue.load(context.octokit, context.payload.issue.node_id);
-  const childrenIssues = await issue.getChildrenIssues(context.octokit);
-  if (!issue.connectedProjectItems[NEON_PRIVATE_ROADMAP.projectId]) {
-    return;
+  try {
+    const issue = await Issue.load(context.octokit, context.payload.issue.node_id);
+    const childrenIssues = await issue.getChildrenIssues(context.octokit);
+    if (!issue.connectedProjectItems[NEON_PRIVATE_ROADMAP.projectId]) {
+      return;
+    }
+    await syncFieldValuesWithSubtasks(
+      context.octokit,
+      issue.connectedProjectItems[NEON_PRIVATE_ROADMAP.projectId],
+      childrenIssues,
+      FIELDS_MAPPING,
+    )
+  } catch(e) {
+    logger(e)
   }
-  await syncFieldValuesWithSubtasks(
-    context.octokit,
-    issue.connectedProjectItems[NEON_PRIVATE_ROADMAP.projectId],
-    childrenIssues,
-    FIELDS_MAPPING,
-  )
 }

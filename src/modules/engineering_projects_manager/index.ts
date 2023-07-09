@@ -8,6 +8,7 @@ import {
   PRODUCT_DESIGN
 } from "../../shared/project_ids";
 import {Octokit} from "@octokit/core";
+import {logger} from "../../shared/logger";
 
 const FIELD_IDS_BY_PROJECT_ID = {
   [CONSOLE.projectId]: {
@@ -74,16 +75,21 @@ export const engineering_projects_manager_listener = (app: Probot) => {
       return;
     }
 
-    let issue = await Issue.load(context.octokit, context.payload.issue.node_id);
-    for (const projectId in issue.connectedProjectItems) {
-      await updateProgressIfPossible(context.octokit, projectId, issue);
-    }
+    try {
 
-    const children = await issue.getChildrenIssues(context.octokit);
-    for (const childIssue of children) {
-      for (const childProjectId in childIssue.connectedProjectItems) {
-        await updateTrackedInIfPossible(context.octokit, childProjectId, childIssue);
+      let issue = await Issue.load(context.octokit, context.payload.issue.node_id);
+      for (const projectId in issue.connectedProjectItems) {
+        await updateProgressIfPossible(context.octokit, projectId, issue);
       }
+
+      const children = await issue.getChildrenIssues(context.octokit);
+      for (const childIssue of children) {
+        for (const childProjectId in childIssue.connectedProjectItems) {
+          await updateTrackedInIfPossible(context.octokit, childProjectId, childIssue);
+        }
+      }
+    } catch(e) {
+      logger(e);
     }
   });
 
@@ -96,14 +102,19 @@ export const engineering_projects_manager_listener = (app: Probot) => {
 
     const projectId =  context.payload.projects_v2_item.project_node_id;
 
-    let issue = await Issue.load(context.octokit, context.payload.projects_v2_item.content_node_id);
+    try {
 
-    await updateTrackedInIfPossible(context.octokit, projectId, issue);
-    await updateProgressIfPossible(context.octokit, projectId, issue);
+      let issue = await Issue.load(context.octokit, context.payload.projects_v2_item.content_node_id);
 
-    const children = await issue.getChildrenIssues(context.octokit);
-    for (const childIssue of children) {
-      await updateTrackedInIfPossible(context.octokit, projectId, childIssue);
+      await updateTrackedInIfPossible(context.octokit, projectId, issue);
+      await updateProgressIfPossible(context.octokit, projectId, issue);
+
+      const children = await issue.getChildrenIssues(context.octokit);
+      for (const childIssue of children) {
+        await updateTrackedInIfPossible(context.octokit, projectId, childIssue);
+      }
+    } catch(e) {
+      logger(e);
     }
   });
 }
