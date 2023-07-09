@@ -2,8 +2,8 @@ import {Context} from "probot/lib/context";
 import {EmitterWebhookEvent, EmitterWebhookEventName, } from "@octokit/webhooks";
 
 import {
-  AUTOSCALING,
-  CONSOLE, CONTROL_PLANE, DATA,
+  AUTOSCALING, COMPUTE,
+  CONSOLE, CONTROL_PLANE, DATA, DOCS,
   ENGINEERING,
   INFRA,
   NEON_PRIVATE_ROADMAP,
@@ -47,6 +47,14 @@ const FIELDS_MAPPING = [
         projectId: DATA.projectId,
         fieldId: DATA.roadmapTargetShipMonthFieldId,
       },
+      {
+        projectId: COMPUTE.projectId,
+        fieldId: COMPUTE.roadmapTargetShipMonthFieldId,
+      },
+      {
+        projectId: DOCS.projectId,
+        fieldId: DOCS.roadmapTargetShipMonthFieldId,
+      },
     ]
   },
   {
@@ -75,6 +83,14 @@ const FIELDS_MAPPING = [
       {
         projectId: DATA.projectId,
         fieldId: DATA.roadmapTargetShipQuarterFieldId,
+      },
+      {
+        projectId: COMPUTE.projectId,
+        fieldId: COMPUTE.roadmapTargetShipQuarterFieldId,
+      },
+      {
+        projectId: DOCS.projectId,
+        fieldId: DOCS.roadmapTargetShipQuarterFieldId,
       },
     ]
   }

@@ -56,3 +56,17 @@ export const DATA = {
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4ALGJWzgL3Pu8',
   roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4ALGJWzgL3PuQ',
 }
+
+// project id: 49
+export const COMPUTE = {
+  projectId: 'PVT_kwDOBKF3Cs4ASNk7',
+  roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4ASNk7zgLoW6k',
+  roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4ASNk7zgLoW6g',
+}
+
+// project id: 25
+export const DOCS = {
+  projectId: 'PVT_kwDOBKF3Cs4ANGVj',
+  roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4ANGVjzgL3PwQ',
+  roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4ANGVjzgL3Pw8',
+}
