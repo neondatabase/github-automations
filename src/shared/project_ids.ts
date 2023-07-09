@@ -86,3 +86,19 @@ export const POSTGRES = {
   roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4AQQPRzgL3QAc',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4AQQPRzgL3RLg',
 }
+
+// project id: 11
+export const PRODUCT = {
+  projectId: 'PVT_kwDOBKF3Cs4AHA73',
+  roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AHA73zgL3Pzo',
+  roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4AHA73zgL3Pzk',
+  trackedInFieldId: 'PVTF_lADOBKF3Cs4AHA73zgL3RSk',
+}
+
+// project id: 10
+export const PIXEL_POINT = {
+  projectId: 'PVT_kwDOBKF3Cs4AFa_n',
+  roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AFa_nzgL3Q_s',
+  roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4AFa_nzgL3Q_A',
+  trackedInFieldId: 'PVTF_lADOBKF3Cs4AFa_nzgL3Raw',
+}

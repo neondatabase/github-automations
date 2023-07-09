@@ -6,7 +6,7 @@ import {
   CONSOLE, CONTROL_PLANE, DATA, DOCS,
   ENGINEERING,
   INFRA,
-  NEON_PRIVATE_ROADMAP, POSTGRES,
+  NEON_PRIVATE_ROADMAP, PIXEL_POINT, POSTGRES, PRODUCT,
   PRODUCT_DESIGN
 } from "../../shared/project_ids";
 import {Issue} from "../../shared/issue";
@@ -59,6 +59,14 @@ const FIELDS_MAPPING = [
         projectId: POSTGRES.projectId,
         fieldId: POSTGRES.roadmapTargetShipMonthFieldId,
       },
+      {
+        projectId: PRODUCT.projectId,
+        fieldId: PRODUCT.roadmapTargetShipMonthFieldId,
+      },
+      {
+        projectId: PIXEL_POINT.projectId,
+        fieldId: PIXEL_POINT.roadmapTargetShipMonthFieldId,
+      },
     ]
   },
   {
@@ -99,6 +107,14 @@ const FIELDS_MAPPING = [
       {
         projectId: POSTGRES.projectId,
         fieldId: POSTGRES.roadmapTargetShipQuarterFieldId,
+      },
+      {
+        projectId: PRODUCT.projectId,
+        fieldId: PRODUCT.roadmapTargetShipQuarterFieldId,
+      },
+      {
+        projectId: PIXEL_POINT.projectId,
+        fieldId: PIXEL_POINT.roadmapTargetShipQuarterFieldId,
       },
     ]
   }

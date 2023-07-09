@@ -4,7 +4,7 @@ import {
   AUTOSCALING, COMPUTE,
   CONSOLE,
   CONTROL_PLANE, DATA, DOCS,
-  ENGINEERING, INFRA, POSTGRES,
+  ENGINEERING, INFRA, PIXEL_POINT, POSTGRES, PRODUCT,
   PRODUCT_DESIGN
 } from "../../shared/project_ids";
 import {Octokit} from "@octokit/core";
@@ -41,6 +41,12 @@ const FIELD_IDS_BY_PROJECT_ID = {
   },
   [POSTGRES.projectId]: {
     trackedIn: POSTGRES.trackedInFieldId,
+  },
+  [PRODUCT.projectId]: {
+    trackedIn: PRODUCT.trackedInFieldId,
+  },
+  [PIXEL_POINT.projectId]: {
+    trackedIn: PIXEL_POINT.trackedInFieldId,
   },
 }
 
