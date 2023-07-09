@@ -29,8 +29,10 @@ export const PRODUCT_DESIGN = {
   roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4AL_XjzgL3Peo',
 };
 
+// project id: 37
 export const INFRA = {
   projectId: 'PVT_kwDOBKF3Cs4AQhn_',
+  roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AQhn_zgKjQLU',
   roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4AQhn_zgKjQLQ',
 }
 
