@@ -3,7 +3,7 @@ import {EmitterWebhookEvent, EmitterWebhookEventName, } from "@octokit/webhooks"
 
 import {
   AUTOSCALING,
-  CONSOLE,
+  CONSOLE, CONTROL_PLANE,
   ENGINEERING,
   INFRA,
   NEON_PRIVATE_ROADMAP,
@@ -38,7 +38,11 @@ const FIELDS_MAPPING = [
       {
         projectId: AUTOSCALING.projectId,
         fieldId: AUTOSCALING.roadmapTargetShipMonthFieldId,
-      }
+      },
+      {
+        projectId: CONTROL_PLANE.projectId,
+        fieldId: CONTROL_PLANE.roadmapTargetShipMonthFieldId,
+      },
     ]
   },
   {
@@ -59,7 +63,11 @@ const FIELDS_MAPPING = [
       {
         projectId: AUTOSCALING.projectId,
         fieldId: AUTOSCALING.roadmapTargetShipQuarterFieldId,
-      }
+      },
+      {
+        projectId: CONTROL_PLANE.projectId,
+        fieldId: CONTROL_PLANE.roadmapTargetShipQuarterFieldId,
+      },
     ]
   }
 ];

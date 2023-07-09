@@ -40,3 +40,10 @@ export const AUTOSCALING = {
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4ASNufzgLodD0',
   roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4ASNufzgLodDw',
 }
+
+// project id: 48
+export const CONTROL_PLANE = {
+  projectId: 'PVT_kwDOBKF3Cs4ASIxL',
+  roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4ASIxLzgLlRoA',
+  roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4ASIxLzgLlRn8',
+}
