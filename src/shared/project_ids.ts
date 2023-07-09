@@ -1,3 +1,4 @@
+// project id: 8
 export const NEON_PRIVATE_ROADMAP = {
   projectId: "PVT_kwDOBKF3Cs4ADWZl",
   targetShipMothFieldId: "PVTIF_lADOBKF3Cs4ADWZlzgB7V1c",
@@ -5,6 +6,7 @@ export const NEON_PRIVATE_ROADMAP = {
   forceSyncFieldId: 'PVTF_lADOBKF3Cs4ADWZlzgKz5cA',
 };
 
+// project id: 21
 export const CONSOLE = {
   projectId: "PVT_kwDOBKF3Cs4AMKWT",
   trackedInFieldId: 'PVTF_lADOBKF3Cs4AMKWTzgHwfhM',
