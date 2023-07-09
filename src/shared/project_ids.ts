@@ -13,6 +13,7 @@ export const CONSOLE = {
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AMKWTzgKS3O4',
 };
 
+// project id: 6
 export const ENGINEERING = {
   projectId: 'PVT_kwDOBKF3Cs1e-g',
   trackedInFieldId: 'PVTF_lADOBKF3Cs1e-s4AB3Qt',
@@ -21,9 +22,11 @@ export const ENGINEERING = {
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs1e-s4Ck_-L',
 };
 
+// project id: 17
 export const PRODUCT_DESIGN = {
   projectId: 'PVT_kwDOBKF3Cs4AL_Xj',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AL_XjzgKe_xI',
+  roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4AL_XjzgL3Peo',
 };
 
 export const INFRA = {

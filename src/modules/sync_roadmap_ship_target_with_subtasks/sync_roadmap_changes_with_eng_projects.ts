@@ -28,6 +28,10 @@ const FIELDS_MAPPING = [
         fieldId: ENGINEERING.roadmapTargetShipMonthFieldId,
       },
       {
+        projectId: PRODUCT_DESIGN.projectId,
+        fieldId: PRODUCT_DESIGN.roadmapTargetShipMonthFieldId,
+      },
+      {
         projectId: INFRA.projectId,
         fieldId: INFRA.roadmapTargetShipMonthFieldId,
       },
