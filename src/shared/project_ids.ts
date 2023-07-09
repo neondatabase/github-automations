@@ -70,3 +70,10 @@ export const DOCS = {
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4ANGVjzgL3PwQ',
   roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4ANGVjzgL3Pw8',
 }
+
+// project id: 32
+export const POSTGRES = {
+  projectId: 'PVT_kwDOBKF3Cs4AQQPR',
+  roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AQQPRzgL3QBI',
+  roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4AQQPRzgL3QAc',
+}
