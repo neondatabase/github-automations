@@ -30,3 +30,10 @@ export const INFRA = {
   projectId: 'PVT_kwDOBKF3Cs4AQhn_',
   roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4AQhn_zgKjQLQ',
 }
+
+// project id: 50
+export const AUTOSCALING = {
+  projectId: 'PVT_kwDOBKF3Cs4ASNuf',
+  roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4ASNufzgLodD0',
+  roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4ASNufzgLodDw',
+}

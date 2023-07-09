@@ -2,6 +2,7 @@ import {Context} from "probot/lib/context";
 import {EmitterWebhookEvent, EmitterWebhookEventName, } from "@octokit/webhooks";
 
 import {
+  AUTOSCALING,
   CONSOLE,
   ENGINEERING,
   INFRA,
@@ -29,6 +30,10 @@ const FIELDS_MAPPING = [
       {
         projectId: INFRA.projectId,
         fieldId: INFRA.roadmapTargetShipMonthFieldId,
+      },
+      {
+        projectId: AUTOSCALING.projectId,
+        fieldId: AUTOSCALING.roadmapTargetShipMonthFieldId,
       }
     ]
   },
@@ -47,6 +52,10 @@ const FIELDS_MAPPING = [
         projectId: PRODUCT_DESIGN.projectId,
         fieldId: PRODUCT_DESIGN.roadmapTargetShipQuarterFieldId,
       },
+      {
+        projectId: AUTOSCALING.projectId,
+        fieldId: AUTOSCALING.roadmapTargetShipQuarterFieldId,
+      }
     ]
   }
 ];
