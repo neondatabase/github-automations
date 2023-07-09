@@ -1,6 +1,12 @@
 import {Probot} from "probot";
 import {Issue} from "../../shared/issue";
-import {CONSOLE, ENGINEERING} from "../../shared/project_ids";
+import {
+  AUTOSCALING, COMPUTE,
+  CONSOLE,
+  CONTROL_PLANE, DATA, DOCS,
+  ENGINEERING, INFRA, PIXEL_POINT, POSTGRES, PRODUCT,
+  PRODUCT_DESIGN
+} from "../../shared/project_ids";
 import {Octokit} from "@octokit/core";
 
 const FIELD_IDS_BY_PROJECT_ID = {
@@ -11,7 +17,37 @@ const FIELD_IDS_BY_PROJECT_ID = {
   [ENGINEERING.projectId]: {
     trackedIn: ENGINEERING.trackedInFieldId,
     progress: ENGINEERING.progressFieldId,
-  }
+  },
+  [AUTOSCALING.projectId]: {
+    trackedIn: AUTOSCALING.trackedInFieldId,
+  },
+  [PRODUCT_DESIGN.projectId]: {
+    trackedIn: PRODUCT_DESIGN.trackedInFieldId,
+  },
+  [CONTROL_PLANE.projectId]: {
+    trackedIn: CONTROL_PLANE.trackedInFieldId,
+  },
+  [INFRA.projectId]: {
+    trackedIn: INFRA.trackedInFieldId,
+  },
+  [DATA.projectId]: {
+    trackedIn: DATA.trackedInFieldId,
+  },
+  [COMPUTE.projectId]: {
+    trackedIn: COMPUTE.trackedInFieldId,
+  },
+  [DOCS.projectId]: {
+    trackedIn: DOCS.trackedInFieldId,
+  },
+  [POSTGRES.projectId]: {
+    trackedIn: POSTGRES.trackedInFieldId,
+  },
+  [PRODUCT.projectId]: {
+    trackedIn: PRODUCT.trackedInFieldId,
+  },
+  [PIXEL_POINT.projectId]: {
+    trackedIn: PIXEL_POINT.trackedInFieldId,
+  },
 }
 
 const updateTrackedInIfPossible = async (kit: Octokit, projectId: string, issue: Issue) => {
@@ -53,10 +89,8 @@ export const engineering_projects_manager_listener = (app: Probot) => {
 
   app.on(["projects_v2_item.created"], async (context) => {
     // we use this event instead issue.edited because in this event we will get the project_node_id
-    if (![
-      CONSOLE.projectId,
-      ENGINEERING.projectId,
-    ].includes(context.payload.projects_v2_item.project_node_id)) {
+    if (!(Object.keys(FIELD_IDS_BY_PROJECT_ID))
+      .includes(context.payload.projects_v2_item.project_node_id)) {
       return;
     }
 

@@ -2,10 +2,11 @@ import {Context} from "probot/lib/context";
 import {EmitterWebhookEvent, EmitterWebhookEventName, } from "@octokit/webhooks";
 
 import {
-  CONSOLE,
+  AUTOSCALING, COMPUTE,
+  CONSOLE, CONTROL_PLANE, DATA, DOCS,
   ENGINEERING,
   INFRA,
-  NEON_PRIVATE_ROADMAP,
+  NEON_PRIVATE_ROADMAP, PIXEL_POINT, POSTGRES, PRODUCT,
   PRODUCT_DESIGN
 } from "../../shared/project_ids";
 import {Issue} from "../../shared/issue";
@@ -27,9 +28,45 @@ const FIELDS_MAPPING = [
         fieldId: ENGINEERING.roadmapTargetShipMonthFieldId,
       },
       {
+        projectId: PRODUCT_DESIGN.projectId,
+        fieldId: PRODUCT_DESIGN.roadmapTargetShipMonthFieldId,
+      },
+      {
         projectId: INFRA.projectId,
         fieldId: INFRA.roadmapTargetShipMonthFieldId,
-      }
+      },
+      {
+        projectId: AUTOSCALING.projectId,
+        fieldId: AUTOSCALING.roadmapTargetShipMonthFieldId,
+      },
+      {
+        projectId: CONTROL_PLANE.projectId,
+        fieldId: CONTROL_PLANE.roadmapTargetShipMonthFieldId,
+      },
+      {
+        projectId: DATA.projectId,
+        fieldId: DATA.roadmapTargetShipMonthFieldId,
+      },
+      {
+        projectId: COMPUTE.projectId,
+        fieldId: COMPUTE.roadmapTargetShipMonthFieldId,
+      },
+      {
+        projectId: DOCS.projectId,
+        fieldId: DOCS.roadmapTargetShipMonthFieldId,
+      },
+      {
+        projectId: POSTGRES.projectId,
+        fieldId: POSTGRES.roadmapTargetShipMonthFieldId,
+      },
+      {
+        projectId: PRODUCT.projectId,
+        fieldId: PRODUCT.roadmapTargetShipMonthFieldId,
+      },
+      {
+        projectId: PIXEL_POINT.projectId,
+        fieldId: PIXEL_POINT.roadmapTargetShipMonthFieldId,
+      },
     ]
   },
   {
@@ -46,6 +83,38 @@ const FIELDS_MAPPING = [
       {
         projectId: PRODUCT_DESIGN.projectId,
         fieldId: PRODUCT_DESIGN.roadmapTargetShipQuarterFieldId,
+      },
+      {
+        projectId: AUTOSCALING.projectId,
+        fieldId: AUTOSCALING.roadmapTargetShipQuarterFieldId,
+      },
+      {
+        projectId: CONTROL_PLANE.projectId,
+        fieldId: CONTROL_PLANE.roadmapTargetShipQuarterFieldId,
+      },
+      {
+        projectId: DATA.projectId,
+        fieldId: DATA.roadmapTargetShipQuarterFieldId,
+      },
+      {
+        projectId: COMPUTE.projectId,
+        fieldId: COMPUTE.roadmapTargetShipQuarterFieldId,
+      },
+      {
+        projectId: DOCS.projectId,
+        fieldId: DOCS.roadmapTargetShipQuarterFieldId,
+      },
+      {
+        projectId: POSTGRES.projectId,
+        fieldId: POSTGRES.roadmapTargetShipQuarterFieldId,
+      },
+      {
+        projectId: PRODUCT.projectId,
+        fieldId: PRODUCT.roadmapTargetShipQuarterFieldId,
+      },
+      {
+        projectId: PIXEL_POINT.projectId,
+        fieldId: PIXEL_POINT.roadmapTargetShipQuarterFieldId,
       },
     ]
   }
