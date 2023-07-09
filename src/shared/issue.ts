@@ -202,15 +202,20 @@ export class Issue {
     }
 
     if (!isDryRun()) {
-      const resp = await kit.graphql(setField, {
-        project_id: projectId,
-        project_item_id: this.connectedProjectItems[projectId],
-        tracked_field_id: fieldId,
-        value,
-      });
-      logger('resp: ', resp)
+      try {
+        const resp = await kit.graphql(setField, {
+          project_id: projectId,
+          project_item_id: this.connectedProjectItems[projectId],
+          tracked_field_id: fieldId,
+          value,
+        });
+        logger('resp: ', resp)
+      } catch(e) {
+        logger('failed to update value for', this.title)
+        console.log(e)
+      }
     }
-    logger("updated value for", this.title)
+    logger("update value for finished", this.title)
 
   }
 
