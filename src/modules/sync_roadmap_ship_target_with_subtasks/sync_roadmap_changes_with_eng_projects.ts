@@ -2,6 +2,7 @@ import {Context} from "probot/lib/context";
 import {EmitterWebhookEvent, EmitterWebhookEventName, } from "@octokit/webhooks";
 
 import {
+  ALL_EPICS,
   AUTOSCALING, COMPUTE,
   CONSOLE, CONTROL_PLANE, DATA, DOCS,
   ENGINEERING,
@@ -67,6 +68,10 @@ const FIELDS_MAPPING = [
         projectId: PIXEL_POINT.projectId,
         fieldId: PIXEL_POINT.roadmapTargetShipMonthFieldId,
       },
+      {
+        projectId: ALL_EPICS.projectId,
+        fieldId: ALL_EPICS.roadmapTargetShipMonthFieldId,
+      },
     ]
   },
   {
@@ -115,6 +120,10 @@ const FIELDS_MAPPING = [
       {
         projectId: PIXEL_POINT.projectId,
         fieldId: PIXEL_POINT.roadmapTargetShipQuarterFieldId,
+      },
+      {
+        projectId: ALL_EPICS.projectId,
+        fieldId: ALL_EPICS.roadmapTargetShipQuarterFieldId,
       },
     ]
   }

@@ -104,3 +104,10 @@ export const PIXEL_POINT = {
   roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4AFa_nzgL3Q_A',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4AFa_nzgL3Raw',
 }
+
+// project id: 64
+export const ALL_EPICS = {
+  projectId: 'PVT_kwDOBKF3Cs4AUkqb',
+  roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AUkqbzgNJOys',
+  roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4AUkqbzgNJOyo',
+}
