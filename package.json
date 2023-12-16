@@ -20,7 +20,7 @@
     "@slack/web-api": "^6.7.1",
     "async-await-queue": "^1.2.0",
     "axios": "^0.26.0",
-    "probot": "^12.3.0"
+    "probot": "^12.3.3"
   },
   "devDependencies": {
     "@types/jest": "^26.0.19",
