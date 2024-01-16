@@ -13,11 +13,9 @@ import {logger} from "../../shared/logger";
 const FIELD_IDS_BY_PROJECT_ID = {
   [CONSOLE.projectId]: {
     trackedIn: CONSOLE.trackedInFieldId,
-    progress: CONSOLE.progressFieldId,
   },
   [ENGINEERING.projectId]: {
     trackedIn: ENGINEERING.trackedInFieldId,
-    progress: ENGINEERING.progressFieldId,
   },
   [AUTOSCALING.projectId]: {
     trackedIn: AUTOSCALING.trackedInFieldId,
@@ -59,13 +57,6 @@ const updateTrackedInIfPossible = async (kit: Octokit, projectId: string, issue:
   }
 }
 
-const updateProgressIfPossible = async (kit: Octokit, projectId: string, issue: Issue) => {
-  const fieldId = FIELD_IDS_BY_PROJECT_ID[projectId].progress;
-  if (fieldId) {
-    await issue.setFieldValue(kit, projectId, fieldId, issue.progress());
-  }
-}
-
 export const engineering_projects_manager_listener = (app: Probot) => {
   app.on(["issues.edited"], async (context) => {
     if (![
@@ -78,9 +69,6 @@ export const engineering_projects_manager_listener = (app: Probot) => {
     try {
 
       let issue = await Issue.load(context.octokit, context.payload.issue.node_id);
-      for (const projectId in issue.connectedProjectItems) {
-        await updateProgressIfPossible(context.octokit, projectId, issue);
-      }
 
       const children = await issue.getChildrenIssues(context.octokit);
       for (const childIssue of children) {
@@ -107,7 +95,6 @@ export const engineering_projects_manager_listener = (app: Probot) => {
       let issue = await Issue.load(context.octokit, context.payload.projects_v2_item.content_node_id);
 
       await updateTrackedInIfPossible(context.octokit, projectId, issue);
-      await updateProgressIfPossible(context.octokit, projectId, issue);
 
       const children = await issue.getChildrenIssues(context.octokit);
       for (const childIssue of children) {
