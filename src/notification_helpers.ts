@@ -1,4 +1,5 @@
 import {Block, ChatPostMessageArguments, KnownBlock, WebClient} from "@slack/web-api";
+import {logger} from "./shared/logger";
 
 export type MessageContent = Omit<ChatPostMessageArguments, 'channel'>;
 type TemplateFunc = (args: any) => MessageContent | undefined;
@@ -31,7 +32,7 @@ export const getEnvChannelName = (workflow_run: { head_branch?: string }) => {
 
 export const sendDeployNotification = async (data: MessageContent, channelName?: string) => {
   if (!channelName) {
-    console.log("Unknown chat name");
+    logger("info", "Unknown chat name");
     return
   }
 
@@ -40,9 +41,9 @@ export const sendDeployNotification = async (data: MessageContent, channelName?:
       ...data,
       channel: channelName,
     });
-    console.log('Chat message request completed:', result);
+    logger("info", 'Chat message request completed:', result);
   } catch (e) {
-    console.log("failed to send notification message")
+    logger("info", "failed to send notification message")
     console.error(e);
   }
 }

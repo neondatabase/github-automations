@@ -216,7 +216,7 @@ export class Issue {
         logger("info", 'resp: ', resp)
       } catch(e) {
         logger("info", 'failed to update value for', this.title)
-        console.log(e)
+        logger("error", e)
       }
     }
     logger("info", "update value for finished", this.title)

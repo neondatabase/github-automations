@@ -6,6 +6,7 @@ import {
   MessageContent, sendDeployNotification
 } from "../../notification_helpers";
 import Queue from "async-await-queue";
+import {logger} from "../../shared/logger";
 
 export const deploy_notifications_listener = (app: Probot) => {
   const CONSOLE_DEPLOY_WORKFLOW_ID = parseInt(process.env.CONSOLE_DEPLOY_WORKFLOW_ID || '');
@@ -30,8 +31,8 @@ export const deploy_notifications_listener = (app: Probot) => {
     ) {
       notificationsQueue.run(async () => {
         try {
-          console.log("workflow_run: ", context.id);
-          console.log(context.payload)
+          logger("info", "workflow_run: ", context.id);
+          logger("info", context.payload)
 
           let msg: MessageContent | undefined;
           switch (workflow_run.workflow_id) {
@@ -61,8 +62,8 @@ export const deploy_notifications_listener = (app: Probot) => {
             await sendDeployNotification(msg, getEnvChannelName(workflow_run));
           }
         } catch(e) {
-          console.log('failed')
-          console.log(e);
+          logger("info", 'failed')
+          logger("error", e);
         }
       });
     }
