@@ -53,6 +53,8 @@ const updateTrackedInIfPossible = async (kit: Octokit, projectId: string, issue:
   const trackedInFieldId = FIELD_IDS_BY_PROJECT_ID[projectId].trackedIn;
   if (trackedInFieldId) {
     const trackedInValue = await issue.trackedIn(kit, projectId);
+    logger("info", "update tracked in field for:", issue.title);
+    logger("info", "update tracked in field value:", trackedInValue);
     await issue.setFieldValue(kit, projectId, trackedInFieldId, trackedInValue);
   }
 }
@@ -77,7 +79,7 @@ export const engineering_projects_manager_listener = (app: Probot) => {
         }
       }
     } catch(e) {
-      logger(e);
+      logger("error", e);
     }
   });
 
@@ -101,7 +103,7 @@ export const engineering_projects_manager_listener = (app: Probot) => {
         await updateTrackedInIfPossible(context.octokit, projectId, childIssue);
       }
     } catch(e) {
-      logger(e);
+      logger("error", e);
     }
   });
 }

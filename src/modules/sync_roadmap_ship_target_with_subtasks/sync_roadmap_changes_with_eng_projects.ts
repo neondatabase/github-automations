@@ -131,10 +131,10 @@ const FIELDS_MAPPING = [
 
 const syncFieldValuesWithSubtasks = async (kit: Octokit, roadmapNodeId: string, issues: Issue[], fieldMapping: Array<{ from: string, to: Array<{ projectId: string, fieldId: string }> }>) => {
   const {node} = await kit.graphql(projectV2ItemByNodeId, {project_item_id: roadmapNodeId});
-  logger("syncFieldValuesWithSubtasks")
-  logger("processing node:", node);
-  logger("processing children:", issues);
-  logger("field mapping: ", fieldMapping);
+  logger("info", "syncFieldValuesWithSubtasks")
+  logger("info", "processing node:", node);
+  logger("info", "processing children:", issues);
+  logger("info", "field mapping: ", fieldMapping);
 
   issues.map(async (issueItem) => {
     if (issueItem.closed) {
@@ -167,15 +167,20 @@ export const handleRoadmapProjectItemChange = async (context: EmitterWebhookEven
     return;
   }
 
-  const mapping = context.payload.changes.field_value.field_node_id === NEON_PRIVATE_ROADMAP.forceSyncFieldId
+  logger("info", 'changed field id', context.payload.changes.field_value.field_node_id);
+  logger("info", 'force sync field id', NEON_PRIVATE_ROADMAP.forceSyncFieldId)
+
+  const isForceSyncFieldChanged = context.payload.changes.field_value.field_node_id === NEON_PRIVATE_ROADMAP.forceSyncFieldId;
+
+  const mapping = isForceSyncFieldChanged
     ? FIELDS_MAPPING
     : FIELDS_MAPPING.filter(item => item.from === context.payload.changes.field_value.field_node_id);
 
-  // logger("changes", context.payload.changes)
-  logger("All mapping", FIELDS_MAPPING)
-  logger("will apply mapping", mapping)
-  if (!mapping.length) {
-    logger("skipping because nothing to map")
+  // logger("info", "changes", context.payload.changes)
+  logger("info", "All mapping", FIELDS_MAPPING)
+  logger("info", "will apply mapping", mapping)
+  if (!mapping || !mapping.length) {
+    logger("info", "skipping because nothing to map")
   }
 
   try {
@@ -188,7 +193,7 @@ export const handleRoadmapProjectItemChange = async (context: EmitterWebhookEven
       mapping,
     )
   } catch(e) {
-    logger('Failed to sync fields with subtask ')
+    logger("info", 'Failed to sync fields with subtask ')
   }
 }
 
@@ -206,6 +211,6 @@ export const handleRoadmapIssueChange = async (context: EmitterWebhookEvent<"iss
       FIELDS_MAPPING,
     )
   } catch(e) {
-    logger(e)
+    logger("error", e)
   }
 }

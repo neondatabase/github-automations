@@ -77,14 +77,14 @@ export class Issue {
     let resp: GraphQlQueryResponseData = await kit.graphql(issueWithParents, {
       issue_id: issueNodeId,
     });
-    logger(resp);
+    logger("info", resp);
     if (!resp.node) {
-      logger("failed to parse issue", resp)
+      logger("info","failed to parse issue", resp)
       throw new Error("failed to parse issue");
     }
     let issue = new Issue(resp.node);
     await issue.loadConnectedProjectItems(kit);
-    logger("new ZenithIssue object: ", issue);
+    logger("info", "new ZenithIssue object: ", issue);
     return issue;
   }
 
@@ -176,13 +176,13 @@ export class Issue {
   }
 
   private async loadConnectedProjectItems(kit: Octokit) {
-    logger("loading connections for issue,", this.node_id);
+    logger("info", "loading connections for issue,", this.node_id);
     // get info about connected project items
     const resp: GraphQlQueryResponseData = await kit.graphql(issueProjectV2Items, {
       id: this.node_id,
     });
 
-    logger('loaded connections: ', resp);
+    logger("info", 'loaded connections: ', resp);
     const {node} = resp;
 
     if (!node || !node.projectItems || !node.projectItems.nodes || !node.projectItems.nodes.length) {
@@ -192,16 +192,16 @@ export class Issue {
     for (const item of node.projectItems.nodes) {
       this.connectedProjectItems[item.project.id] = item.id;
     }
-    logger("done loading connections, result:", this.connectedProjectItems);
+    logger("info", "done loading connections, result:", this.connectedProjectItems);
   }
 
   async setFieldValue(kit: Octokit, projectId: string, fieldId: string, value: any) {
-    logger("start setFieldValue epic:", this.title)
-    logger("start setFieldValue fieldId:", fieldId)
-    logger("start setFieldValue value:", value)
+    // logger("info", "start setFieldValue epic:", this.title)
+    // logger("info", "start setFieldValue fieldId:", fieldId)
+    // logger("info", "start setFieldValue value:", value)
     if (!this.connectedProjectItems[projectId]) {
       // issue doesn't not belong to this project
-      logger("skipping because does not belong to project", this.title)
+      logger("info", "skipping because does not belong to project", this.title)
       return;
     }
 
@@ -213,20 +213,20 @@ export class Issue {
           tracked_field_id: fieldId,
           value,
         });
-        logger('resp: ', resp)
+        logger("info", 'resp: ', resp)
       } catch(e) {
-        logger('failed to update value for', this.title)
+        logger("info", 'failed to update value for', this.title)
         console.log(e)
       }
     }
-    logger("update value for finished", this.title)
+    logger("info", "update value for finished", this.title)
 
   }
 
   async getChildrenIssues(kit: Octokit) {
-    logger(`getChildrenIssues: ${this.title}`);
+    logger("info", `getChildrenIssues: ${this.title}`);
     if (!this.subtasks.length) {
-      logger(`skip because no subtasks`);
+      logger("info", `skip because no subtasks`);
       return [];
     }
 
@@ -236,20 +236,20 @@ export class Issue {
         continue;
       }
 
-      logger(`processing ${issueData.repo}#${issueData.number}`);
+      logger("info", `processing ${issueData.repo}#${issueData.number}`);
       let {data: issue} = await kit.request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
         owner: this.owner_login,
         repo: issueData.repo,
         issue_number: issueData.number,
       });
 
-      logger(`process ${issue.id}`, issue);
+      logger("info", `process ${issue.id}`, issue);
       try {
         const zIssue = await Issue.load(kit, issue.node_id);
         res.push(zIssue);
-        logger(`done processing ${issue.title}`);
+        logger("info", `done processing ${issue.title}`);
       } catch(e) {
-        logger(e)
+        logger("error", e)
       }
     }
 
@@ -258,8 +258,8 @@ export class Issue {
 
   async syncChildrenMilestone(kit: Octokit, oldMilestone: Milestone | null, newMilestone: Milestone | null) { // todo
     if (this.subtasks.length) {
-      logger('sync children milestone, from:', oldMilestone);
-      logger('sync children milestone, to:', newMilestone);
+      logger("info", 'sync children milestone, from:', oldMilestone);
+      logger("info", 'sync children milestone, to:', newMilestone);
     }
     const milestoneMap: Record<string, number> = {};
     // sync milestones for children
@@ -268,13 +268,13 @@ export class Issue {
 
       // don't update closed subtasks
       if (_closed || !issueData) {
-        logger(`skip "${title}" because it's closed or couldn't be parsed`);
+        logger("info", `skip "${title}" because it's closed or couldn't be parsed`);
         continue;
       }
 
       const {repo, number: issue_number} = issueData;
 
-      logger(`processing ${repo}#${issue_number}`);
+      logger("info", `processing ${repo}#${issue_number}`);
       let {data: issue} = await kit.request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
         owner: this.owner_login,
         repo,
@@ -285,7 +285,7 @@ export class Issue {
         (issue.milestone && !oldMilestone) ||
         (issue.milestone && oldMilestone && issue.milestone.title !== oldMilestone.title)
       ) {
-        logger(`skip ${repo}#${issue_number} because it didn't match the old milestone: issue milestone: ${issue.milestone?.number}, old milestone: ${oldMilestone?.number}`);
+        logger("info", `skip ${repo}#${issue_number} because it didn't match the old milestone: issue milestone: ${issue.milestone?.number}, old milestone: ${oldMilestone?.number}`);
 
         continue;
       }
@@ -322,7 +322,7 @@ export class Issue {
         });
       }
 
-      logger(`set issue #${repo}/${issue_number} milestone to`, milestoneNumber);
+      logger("info", `set issue #${repo}/${issue_number} milestone to`, milestoneNumber);
     }
   }
 }
