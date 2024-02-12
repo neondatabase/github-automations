@@ -89,7 +89,7 @@ const getCommitEmbeds: (w: any) => Block|KnownBlock = (
   };
 }
 
-export const getDeploymentEnv = (workflow_run: any) => {
+const getWorkflowEnv = (workflow_run: any) => {
   if (isConsoleRepo(workflow_run)) {
     if (workflow_run.head_branch == process.env.CONSOLE_STAGING_BRANCH_NAME) {
       return "*[ STAGING CONSOLE ]*";
@@ -105,16 +105,16 @@ export const getDeploymentEnv = (workflow_run: any) => {
       return "*[ PRODUCTION NEON ]*";
     }
   }
-  throw new Error("Unknown deployment workflow run id");
+  throw new Error("Unknown workflow run id");
 }
 
-export const deploySucceedTemplate: TemplateFunc = (workflow_run: any) => {
+export const workflowSucceedTemplate: TemplateFunc = (workflow_run: any) => {
   let component = 'console';
   if (isNeonRepo(workflow_run)) {
     component = 'storage'
   }
 
-  const header = `New ${component} version has been successfully deployed.`
+  const header = `New ${component} commit has been successfully merged.`
 
   return {
     text: header,
@@ -123,7 +123,7 @@ export const deploySucceedTemplate: TemplateFunc = (workflow_run: any) => {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `${ResultIcons.Success}  ${getDeploymentEnv(workflow_run)} ${header}\n` +
+          text: `${ResultIcons.Success}  ${getWorkflowEnv(workflow_run)} ${header}\n` +
             `Deploy number: ${workflow_run.run_number}.\n` +
             `HEAD now is: \n`,
         }
@@ -133,8 +133,8 @@ export const deploySucceedTemplate: TemplateFunc = (workflow_run: any) => {
   };
 }
 
-export const deployFailedTemplate: TemplateFunc = (workflow_run: any) => {
-  const header = `Deployment #${workflow_run.run_number} failed`
+export const workflowFailedTemplate: TemplateFunc = (workflow_run: any) => {
+  const header = `Workflow #${workflow_run.run_number} failed`
 
   return {
     text: header,
@@ -143,7 +143,7 @@ export const deployFailedTemplate: TemplateFunc = (workflow_run: any) => {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `${ResultIcons.Failed}  ${getDeploymentEnv(workflow_run)} ${header} :(\n` +
+          text: `${ResultIcons.Failed}  ${getWorkflowEnv(workflow_run)} ${header} :(\n` +
             `Logs: <${workflow_run.html_url}|view on github>\n` +
             `Commit details:`,
         }
@@ -153,8 +153,8 @@ export const deployFailedTemplate: TemplateFunc = (workflow_run: any) => {
   };
 }
 
-export const deployTimedOutTemplate: TemplateFunc = (workflow_run: any) => {
-  const header = `Deployment #${workflow_run.run_number} timed out.`;
+export const workflowTimedOutTemplate: TemplateFunc = (workflow_run: any) => {
+  const header = `Workflow #${workflow_run.run_number} timed out.`;
   return {
     text: header,
     blocks: [
@@ -162,7 +162,7 @@ export const deployTimedOutTemplate: TemplateFunc = (workflow_run: any) => {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `${ResultIcons.TimedOut}  ${getDeploymentEnv(workflow_run)} ${header}`,
+          text: `${ResultIcons.TimedOut}  ${getWorkflowEnv(workflow_run)} ${header}`,
         }
       },
       getCommitEmbeds(workflow_run),
@@ -170,8 +170,8 @@ export const deployTimedOutTemplate: TemplateFunc = (workflow_run: any) => {
   };
 }
 
-export const deployCancelledTemplate: TemplateFunc = (workflow_run: any) => {
-  const header = `Deployment #${workflow_run.run_number} was cancelled.`;
+export const workflowCancelledTemplate: TemplateFunc = (workflow_run: any) => {
+  const header = `Workflow #${workflow_run.run_number} was cancelled.`;
 
   return {
     text: header,
@@ -180,7 +180,7 @@ export const deployCancelledTemplate: TemplateFunc = (workflow_run: any) => {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `${ResultIcons.Cancelled}  ${getDeploymentEnv(workflow_run)} ${header}`,
+          text: `${ResultIcons.Cancelled}  ${getWorkflowEnv(workflow_run)} ${header}`,
         }
       },
       getCommitEmbeds(workflow_run),

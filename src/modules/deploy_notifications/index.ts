@@ -1,14 +1,14 @@
 import {Probot} from "probot";
 import {
-  deployCancelledTemplate,
-  deployFailedTemplate,
-  deploySucceedTemplate, deployTimedOutTemplate, getEnvChannelName,
+  workflowCancelledTemplate,
+  workflowFailedTemplate,
+  workflowSucceedTemplate, workflowTimedOutTemplate, getEnvChannelName,
   MessageContent, sendDeployNotification
 } from "../../notification_helpers";
 import Queue from "async-await-queue";
 import {logger} from "../../shared/logger";
 
-export const deploy_notifications_listener = (app: Probot) => {
+export const workflow_notifications_listener = (app: Probot) => {
   const CONSOLE_DEPLOY_WORKFLOW_ID = parseInt(process.env.CONSOLE_DEPLOY_WORKFLOW_ID || '');
   const NEON_DEPLOY_WORKFLOW_ID = parseInt(process.env.NEON_DEPLOY_WORKFLOW_ID || '');
 
@@ -36,21 +36,21 @@ export const deploy_notifications_listener = (app: Probot) => {
 
           let msg: MessageContent | undefined;
           switch (workflow_run.workflow_id) {
-            // deploy to staging
+            // workflow to staging
             case CONSOLE_DEPLOY_WORKFLOW_ID:
             case NEON_DEPLOY_WORKFLOW_ID:
               switch (workflow_run.conclusion) {
                 case "success":
-                  msg = deploySucceedTemplate(workflow_run);
+                  msg = workflowSucceedTemplate(workflow_run);
                   break;
                 case "failure":
-                  msg = deployFailedTemplate(workflow_run);
+                  msg = workflowFailedTemplate(workflow_run);
                   break;
                 case "cancelled":
-                  msg = deployCancelledTemplate(workflow_run);
+                  msg = workflowCancelledTemplate(workflow_run);
                   break;
                 case "timed_out":
-                  msg = deployTimedOutTemplate(workflow_run);
+                  msg = workflowTimedOutTemplate(workflow_run);
                   break;
               }
               break;
