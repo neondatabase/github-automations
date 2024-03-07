@@ -10,6 +10,9 @@ import {logger} from "../../shared/logger";
 
 export const workflow_notifications_listener = (app: Probot) => {
   const CONSOLE_DEPLOY_WORKFLOW_ID = parseInt(process.env.CONSOLE_DEPLOY_WORKFLOW_ID || '');
+  const CPLANE_DEPLOY_WORKFLOW_ID = parseInt(process.env.CPLANE_DEPLOY_WORKFLOW_ID || '');
+  const TOOLSAPI_DEPLOY_WORKFLOW_ID = parseInt(process.env.TOOLSAPI_DEPLOY_WORKFLOW_ID || '');
+  const FORECASTING_DEPLOY_WORKFLOW_ID = parseInt(process.env.FORECASTING_DEPLOY_WORKFLOW_ID || '');
   const NEON_DEPLOY_WORKFLOW_ID = parseInt(process.env.NEON_DEPLOY_WORKFLOW_ID || '');
 
   const notificationsQueue = new Queue(1);
@@ -38,6 +41,9 @@ export const workflow_notifications_listener = (app: Probot) => {
           switch (workflow_run.workflow_id) {
             // workflow to staging
             case CONSOLE_DEPLOY_WORKFLOW_ID:
+            case CPLANE_DEPLOY_WORKFLOW_ID:
+            case TOOLSAPI_DEPLOY_WORKFLOW_ID:
+            case FORECASTING_DEPLOY_WORKFLOW_ID:
             case NEON_DEPLOY_WORKFLOW_ID:
               switch (workflow_run.conclusion) {
                 case "success":
