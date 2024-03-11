@@ -7,7 +7,7 @@ export = (app: Probot) => {
   l.sync_roadmap_ship_target_with_subtasks_listener(app);
   l.engineering_projects_manager_listener(app);
   l.pull_request_label_change_listener(app);
-  l.deploy_notifications_listener(app);
+  l.workflow_notifications_listener(app);
 
   //
   // we can also:
