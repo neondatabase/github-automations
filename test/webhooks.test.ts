@@ -30,6 +30,10 @@ describe("Probot app", () => {
     probot.load(myProbotApp);
   });
 
+  test("noop", () => {
+    expect(1).toStrictEqual(1);
+  });
+
 
   afterEach(() => {
     nock.cleanAll();
