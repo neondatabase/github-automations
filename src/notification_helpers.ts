@@ -91,12 +91,15 @@ const getCommitEmbeds: (w: any) => Block|KnownBlock = (
 
 const getWorkflowEnv = (workflow_run: any) => {
   if (isConsoleRepo(workflow_run)) {
-    if (workflow_run.head_branch == process.env.CONSOLE_STAGING_BRANCH_NAME) {
-      return "*[ STAGING CONSOLE ]*";
-    }
-    if (workflow_run.head_branch == process.env.CONSOLE_PRODUCTION_BRANCH_NAME) {
-      return "*[ PRODUCTION CONSOLE ]*";
-    }
+    const envName =
+      workflow_run.head_branch === process.env.CONSOLE_PRODUCTION_BRANCH_NAME
+        ? 'PRODUCTION' : 'STAGING';
+    // expect workflow_run.workflow == "./something/controlplane.yml"
+    // and produce "CONTROLPLANE"
+    const words = workflow_run.workflow.split('.')
+    const appName = words[words.length - 2].toUpperCase()
+
+    return `*[ ${envName} ${appName} ]*`;
   } else if (isNeonRepo(workflow_run)) {
     if (workflow_run.head_branch == process.env.NEON_STAGING_BRANCH_NAME) {
       return "*[ STAGING NEON ]*";
