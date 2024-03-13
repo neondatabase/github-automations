@@ -112,7 +112,7 @@ const getWorkflowEnv = (workflow_run: any) => {
 }
 
 export const workflowSucceedTemplate: TemplateFunc = (workflow_run: any) => {
-  let component = 'console';
+  let component = 'cloud';
   if (isNeonRepo(workflow_run)) {
     component = 'storage'
   }
