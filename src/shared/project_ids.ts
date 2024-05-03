@@ -111,3 +111,10 @@ export const ALL_EPICS = {
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AUkqbzgNJOys',
   roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4AUkqbzgNJOyo',
 }
+
+// project id: 79
+export const NEON_RELEASE_STATUS = {
+  projectId: 'PVT_kwDOBKF3Cs4AfDv2',
+  statusLastUpdatedFieldId: 'PVTF_lADOBKF3Cs4AfDv2zgZ0RRw',
+  statusFieldId: 'PVTSSF_lADOBKF3Cs4AfDv2zgUgpnk',
+}
