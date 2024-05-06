@@ -142,3 +142,33 @@ query($id: ID!){
   }
 }
 `
+
+export const projectV2ItemStatusFieldValue = `
+query ($project_item_id: ID!) {
+  node(id: $project_item_id) {
+    ... on ProjectV2Item {
+      id,
+      fieldValueByName(name: "Status") {
+        __typename,
+        ... on ProjectV2ItemFieldSingleSelectValue {
+          id,
+          name,
+          updatedAt,
+        }
+      }
+    }
+  }
+}`
+
+export const setDateField = `
+  mutation ($project_id: ID!, $project_item_id: ID!, $date_field_id: ID!, $value: Date!) {
+      updateProjectV2ItemFieldValue(input: {
+        projectId: $project_id,
+        itemId: $project_item_id,
+        fieldId: $date_field_id,
+        value: { date: $value }
+      }) {
+        projectV2Item { id }
+      }
+    }
+  `
