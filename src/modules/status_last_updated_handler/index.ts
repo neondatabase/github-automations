@@ -19,8 +19,8 @@ export const status_last_updated_handler = (app: Probot) => {
       return;
     }
 
-    // @ts-ignore
-    if (context.payload.changes && context.payload.changes.fieldId !== statusFieldId) {
+    if (context.payload.action === "edited"
+      && context.payload.changes.field_value.field_node_id !== statusFieldId) {
       logger("info", 'status_last_updated_handler skipped because changes are not in status field')
       return;
     }
