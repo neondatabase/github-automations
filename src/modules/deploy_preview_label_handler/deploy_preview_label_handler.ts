@@ -47,13 +47,12 @@ export const PRLabeledHandler = async (context: EmitterWebhookEvent<"pull_reques
 
   // find other PRs with this label and remove the label from it
   try {
-    const prevPRs = await context.octokit.request('GET /repos/{owner}/{repo}/pulls', {
+    const prevPRs = await context.octokit.paginate('GET /repos/{owner}/{repo}/pulls', {
       owner: context.payload.repository.owner.login,
       repo: context.payload.repository.name,
-      per_page: 150,
     });
 
-    prevPRs.data.forEach((pr) => {
+    prevPRs.forEach((pr) => {
       if (pr.number !== context.payload.pull_request.number
         && pr.labels.find((prLabel) => prLabel.name === labelName)) {
         logger('info', `Removing label ${labelName} from pr ${context.payload.pull_request.url}`)
