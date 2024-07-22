@@ -118,3 +118,16 @@ export const NEON_RELEASE_STATUS = {
   statusLastUpdatedFieldId: 'PVTF_lADOBKF3Cs4AfDv2zgZ0RRw',
   statusFieldId: 'PVTSSF_lADOBKF3Cs4AfDv2zgUgpnk',
 }
+
+// project id: 95
+export const IDENTITY = {
+  projectId: 'PVT_kwDOBKF3Cs4Ak_eq',
+  trackedInFieldId: 'PVTF_lADOBKF3Cs4Ak_eqzgdHTgc',
+}
+
+// project id: 87
+export const DBAAS = {
+  projectId: 'PVT_kwDOBKF3Cs4AkjdS',
+  trackedInFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgcvnTs',
+}
+
