@@ -3,8 +3,12 @@ import {Issue} from "../../shared/issue";
 import {
   AUTOSCALING, COMPUTE,
   CONSOLE,
-  CONTROL_PLANE, DATA, DOCS,
-  ENGINEERING, INFRA, PIXEL_POINT, POSTGRES, PRODUCT,
+  CONTROL_PLANE, DATA,
+  DBAAS,
+  DOCS,
+  ENGINEERING,
+  IDENTITY,
+  INFRA, PIXEL_POINT, POSTGRES, PRODUCT,
   PRODUCT_DESIGN
 } from "../../shared/project_ids";
 import {Octokit} from "@octokit/core";
@@ -46,6 +50,12 @@ const FIELD_IDS_BY_PROJECT_ID = {
   },
   [PIXEL_POINT.projectId]: {
     trackedIn: PIXEL_POINT.trackedInFieldId,
+  },
+  [IDENTITY.projectId]: {
+    trackedIn: IDENTITY.trackedInFieldId,
+  },
+  [DBAAS.projectId]: {
+    trackedIn: DBAAS.trackedInFieldId,
   },
 }
 
@@ -106,4 +116,44 @@ export const engineering_projects_manager_listener = (app: Probot) => {
       logger("error", e);
     }
   });
+
+  // the code below is for running manually triggered syncs locally:
+  //
+  // 1. uncomment the code below and comment our code above, leave only this listener in the webhooks.js
+  // 2. create a temp field in the project where you want to update Tracked in field
+  // 3. build & run the bot
+  // 4. bulk update the temp field in the project
+  // 5. wait for the bot to update the Tracked in field
+  // 6. stop the bot
+  // 7. delete the temp field
+  // 8. Enjoy!
+  //
+  // app.on(["projects_v2_item.edited"], async (context) => {
+  //   // we use this event instead issue.edited because in this event we will get the project_node_id
+  //   if (!(Object.keys(FIELD_IDS_BY_PROJECT_ID))
+  //     .includes(context.payload.projects_v2_item.project_node_id)
+  //   ) {
+  //     return;
+  //   }
+  //
+  //   if ((context.payload.changes.field_value.field_node_id === FIELD_IDS_BY_PROJECT_ID[context.payload.projects_v2_item.project_node_id].trackedIn)) {
+  //     logger('info', 'skip because the tracked in value was changed')
+  //   }
+  //
+  //   const projectId =  context.payload.projects_v2_item.project_node_id;
+  //
+  //   try {
+  //
+  //     let issue = await Issue.load(context.octokit, context.payload.projects_v2_item.content_node_id);
+  //
+  //     await updateTrackedInIfPossible(context.octokit, projectId, issue);
+  //
+  //     const children = await issue.getChildrenIssues(context.octokit);
+  //     for (const childIssue of children) {
+  //       await updateTrackedInIfPossible(context.octokit, projectId, childIssue);
+  //     }
+  //   } catch(e) {
+  //     logger("error", e);
+  //   }
+  // });
 }
