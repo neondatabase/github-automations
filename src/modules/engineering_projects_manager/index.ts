@@ -9,7 +9,8 @@ import {
   ENGINEERING,
   IDENTITY,
   INFRA, PIXEL_POINT, POSTGRES, PRODUCT,
-  PRODUCT_DESIGN
+  PRODUCT_DESIGN,
+  WORKFLOW
 } from "../../shared/project_ids";
 import {Octokit} from "@octokit/core";
 import {logger} from "../../shared/logger";
@@ -56,6 +57,9 @@ const FIELD_IDS_BY_PROJECT_ID = {
   },
   [DBAAS.projectId]: {
     trackedIn: DBAAS.trackedInFieldId,
+  },
+  [WORKFLOW.projectId]: {
+    trackedIn: WORKFLOW.trackedInFieldId,
   },
 }
 
