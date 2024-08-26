@@ -46,17 +46,20 @@ It is handy to use https://docs.github.com/en/graphql/overview/explorer to check
 E.g. following query would print field id's in our project
 
 ```graphql
-query { 
-  node(id: "PN_kwDOBKF3Cs1e-g") {
-      ... on ProjectNext {
-      fields(first: 20) {
-          nodes {
-          id
-          name
-          settings
+query {
+  organization(login: "neondatabase"){
+    projectV2(number: 89) {
+      id,
+      title,
+      fields(first: 100) {
+        nodes {
+          ... on ProjectV2Field {
+            id,
+            name
           }
+        }
       }
-      }
+    }
   }
 }
 ```
