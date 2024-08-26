@@ -46,7 +46,7 @@ It is handy to use https://docs.github.com/en/graphql/overview/explorer to check
 E.g. following query would print field id's in our project
 
 ```graphql
-query{
+query {
   organization(login: "neondatabase"){
     projectV2(number: 89) {
       id,
@@ -61,7 +61,7 @@ query{
       }
     }
   }
-}'
+}
 ```
 
 ## Contributing
