@@ -3,3 +3,4 @@ export * from './deploy_preview_label_handler';
 export * from './deploy_notifications';
 export * from './engineering_projects_manager';
 export * from './status_last_updated_handler';
+export * from './sync_team_label_with_project'

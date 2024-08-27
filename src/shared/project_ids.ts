@@ -123,12 +123,14 @@ export const NEON_RELEASE_STATUS = {
 export const IDENTITY = {
   projectId: 'PVT_kwDOBKF3Cs4Ak_eq',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4Ak_eqzgdHTgc',
+  teamLabelName: 'team/identity 🆔'
 }
 
 // project id: 87
 export const DBAAS = {
   projectId: 'PVT_kwDOBKF3Cs4AkjdS',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgcvnTs',
+  teamLabelName: 'team/dbaas',
 }
 
 // project id: 89
