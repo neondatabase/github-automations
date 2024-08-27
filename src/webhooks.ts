@@ -9,6 +9,7 @@ export = (app: Probot) => {
   l.pull_request_label_change_listener(app);
   l.workflow_notifications_listener(app);
   l.status_last_updated_handler(app);
+  l.sync_team_label_with_project(app)
 
   //
   // we can also:
