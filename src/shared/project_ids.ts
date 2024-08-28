@@ -137,5 +137,43 @@ export const DBAAS = {
 export const WORKFLOW = {
   projectId: 'PVT_kwDOBKF3Cs4Ak7Jm',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4Ak7JmzgdDpF0',
+  teamLabelName: 'team/workflow',
 }
+
+// project id: 93
+export const BILLING = {
+  projectId: 'PVT_kwDOBKF3Cs4Ak7J2',
+  teamLabelName: 'team/billing 💰'
+}
+
+// project id: 85
+export const GROWTH = {
+  projectId: 'PVT_kwDOBKF3Cs4AkUgD',
+  teamLabelName: 'team/growth'
+}
+
+// project id: 88
+export const BAAS = {
+  projectId: 'PVT_kwDOBKF3Cs4Ak7JT',
+  teamLabelName: 'team/baas'
+}
+
+// project id: 91
+export const AI_EXPERIMENTS = {
+  projectId: 'PVT_kwDOBKF3Cs4Ak7Jy',
+  teamLabelName: 'team/ai'
+}
+
+// project id: 98
+export const QA = {
+  projectId: 'PVT_kwDOBKF3Cs4Al5CB',
+  teamLabelName: 'team/qa'
+}
+
+// project id: 90
+export const AZURE = {
+  projectId: 'PVT_kwDOBKF3Cs4Ak7Jt',
+  teamLabelName: 'team/azure'
+}
+
 
