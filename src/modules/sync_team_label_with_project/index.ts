@@ -1,4 +1,12 @@
-import {DBAAS, IDENTITY} from "../../shared/project_ids";
+import {
+  AI_EXPERIMENTS, AZURE,
+  BAAS,
+  BILLING,
+  DBAAS,
+  GROWTH,
+  IDENTITY, QA,
+  WORKFLOW
+} from "../../shared/project_ids";
 import {Probot} from "probot";
 import {logger} from "../../shared/logger";
 import {isDryRun} from "../../shared/utils";
@@ -23,6 +31,13 @@ import {Issue} from "../../shared/issue";
 const PROJECTS_TO_LABELS_MAP = {
   [DBAAS.projectId]: DBAAS.teamLabelName,
   [IDENTITY.projectId]: IDENTITY.teamLabelName,
+  [BILLING.projectId]: BILLING.teamLabelName,
+  [WORKFLOW.projectId]: WORKFLOW.teamLabelName,
+  [GROWTH.projectId]: GROWTH.teamLabelName,
+  [BAAS.projectId]: BAAS.teamLabelName,
+  [AI_EXPERIMENTS.projectId]: AI_EXPERIMENTS.teamLabelName,
+  [QA.projectId]: QA.teamLabelName,
+  [AZURE.projectId]: AZURE.teamLabelName,
 }
 
 export const sync_team_label_with_project = (app: Probot) => {
