@@ -14,8 +14,13 @@ import {CONFIG, WATCH_PROJECT_IDS} from "./config";
 //
 // How to set it up:
 // Let's say you want to sync field Status from Project X to field "Design Status" to Project Y
-// 1. get all the project IDs <todo: how to do that>
-// 2. todo
+// 1. get all the node ids: you will need Project X node id, projectY node id, source field node id and target field node id.
+// you can use this query https://github.com/neondatabase/github-automations/blob/14d17dc17e7a36b5085477ea659de69a567bb630/src/shared/graphql_queries.ts#L3 and run it in the
+// GH graphql explorer https://docs.github.com/en/graphql/overview/explorer
+// 2. set ids in the config file
+// 3. once your changes are deployed things will start syncing
+// 4. For bulk deploy use force Sync field for the source project. put the id in the config and init bulk update by updating the field in the project view.
+// 4.1 mind the load and don't bulk update more than ~10 items at a time,
 
 export const sync_fields_cross_projects = (app: Probot) => {
   app.on(["projects_v2_item.edited"], async (context) => {
