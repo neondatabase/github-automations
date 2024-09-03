@@ -12,6 +12,14 @@
 //             id,
 //               name
 //           }
+//         ... on ProjectV2IterationField {
+//             id,
+//               name
+//           }
+//         ... on ProjectV2SingleSelectField {
+//             id,
+//               name
+//           }
 //         }
 //       }
 //     }
@@ -105,12 +113,36 @@ query($project_item_id: ID!){
   node(id: $project_item_id) {
 \t\t... on ProjectV2Item {
       id,
+      project {
+        title,
+      }
       fieldValues(last: 100) {
+        totalCount,
         nodes {
           ... on ProjectV2ItemFieldIterationValue {
             title,
+          },
+          ... on ProjectV2ItemFieldSingleSelectValue {
+            optionId,
+            name,
+          },
+          ... on ProjectV2ItemFieldTextValue {
+            text,
+          },
+          ... on ProjectV2ItemFieldNumberValue {
+            number,
+          },
+          ... on ProjectV2ItemFieldDateValue {
+            date,
+          },
+          ... on ProjectV2ItemFieldIterationValue {
+            title,
+          },
+          ... on ProjectV2ItemFieldValueCommon {
+            __typename,
             field {
-              ... on ProjectV2IterationField {
+              ... on ProjectV2FieldCommon {
+                name,
                 id
               }
             },

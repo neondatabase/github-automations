@@ -10,6 +10,7 @@ export = (app: Probot) => {
   l.workflow_notifications_listener(app);
   l.status_last_updated_handler(app);
   l.sync_team_label_with_project(app)
+  l.sync_fields_cross_projects(app);
 
   //
   // we can also:

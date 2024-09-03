@@ -30,6 +30,7 @@ export const PRODUCT_DESIGN = {
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AL_XjzgKe_xI',
   roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4AL_XjzgL3Peo',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4AL_XjzgL3Qvg',
+  statusFieldId: 'PVTSSF_lADOBKF3Cs4AL_XjzgHpb8U',
 };
 
 // project id: 37
@@ -131,6 +132,7 @@ export const DBAAS = {
   projectId: 'PVT_kwDOBKF3Cs4AkjdS',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgcvnTs',
   teamLabelName: 'team/dbaas',
+  designStatusFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgfGXDk',
 }
 
 // project id: 89
