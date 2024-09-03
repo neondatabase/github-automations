@@ -31,6 +31,7 @@ export const PRODUCT_DESIGN = {
   roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4AL_XjzgL3Peo',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4AL_XjzgL3Qvg',
   statusFieldId: 'PVTSSF_lADOBKF3Cs4AL_XjzgHpb8U',
+  forceSyncFieldId: 'PVTF_lADOBKF3Cs4AL_XjzgfGov4',
 };
 
 // project id: 37
@@ -119,6 +120,9 @@ export const NEON_RELEASE_STATUS = {
   statusLastUpdatedFieldId: 'PVTF_lADOBKF3Cs4AfDv2zgZ0RRw',
   statusFieldId: 'PVTSSF_lADOBKF3Cs4AfDv2zgUgpnk',
 }
+
+
+// Product delivery projects
 
 // project id: 95
 export const IDENTITY = {

@@ -15,6 +15,7 @@ export type SyncFieldsConfig = {
 // {sourceProjectId: []}
 export const CONFIG: Record<string, SyncFieldsConfig> = {
   [PRODUCT_DESIGN.projectId]: {
+    forceSyncFieldId: PRODUCT_DESIGN.forceSyncFieldId,
     to: {
       [PRODUCT_DESIGN.statusFieldId]: [
         {projectId: DBAAS.projectId, fieldId: DBAAS.designStatusFieldId}
