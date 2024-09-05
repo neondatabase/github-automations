@@ -129,7 +129,7 @@ const FIELDS_MAPPING = [
   }
 ];
 
-const syncFieldValuesWithSubtasks = async (kit: Octokit, roadmapNodeId: string, issues: Issue[], fieldMapping: Array<{ from: string, to: Array<{ projectId: string, fieldId: string }> }>) => {
+const syncFieldValuesWithSubtasks = async (kit: Octokit, roadmapNodeId: string, issues: Issue[], fieldMapping: Array<{ from: string | undefined, to: Array<{ projectId: string, fieldId: string | undefined }> }>) => {
   const {node} = await kit.graphql(projectV2ItemByNodeId, {project_item_id: roadmapNodeId});
   logger("info", "syncFieldValuesWithSubtasks")
   logger("info", "processing node:", node);
@@ -143,15 +143,19 @@ const syncFieldValuesWithSubtasks = async (kit: Octokit, roadmapNodeId: string, 
     }
 
     for (const {from, to} of fieldMapping) {
-      const fieldData = node.fieldValues.nodes.find((item: {field?: { id: string }, title: string}) => {
-        return item.field && item.field.id === from
-      });
+      if (from) {
+        const fieldData = node.fieldValues.nodes.find((item: {field?: { id: string }, title: string}) => {
+          return item.field && item.field.id === from
+        });
 
-      const nextValue = fieldData ? fieldData.title : '';
+        const nextValue = fieldData ? fieldData.title : '';
 
-      if (!isDryRun()) {
-        for (const {projectId, fieldId} of to) {
-          await issueItem.setFieldValue(kit, projectId, fieldId, nextValue)
+        if (!isDryRun()) {
+          for (const {projectId, fieldId} of to) {
+            if (fieldId) {
+              await issueItem.setFieldValue(kit, projectId, fieldId, nextValue)
+            }
+          }
         }
       }
     }
