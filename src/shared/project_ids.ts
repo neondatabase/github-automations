@@ -30,6 +30,8 @@ export const PRODUCT_DESIGN = {
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AL_XjzgKe_xI',
   roadmapTargetShipMonthFieldId: 'PVTF_lADOBKF3Cs4AL_XjzgL3Peo',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4AL_XjzgL3Qvg',
+  statusFieldId: 'PVTSSF_lADOBKF3Cs4AL_XjzgHpb8U',
+  forceSyncFieldId: 'PVTF_lADOBKF3Cs4AL_XjzgfGov4',
 };
 
 // project id: 37
@@ -119,6 +121,9 @@ export const NEON_RELEASE_STATUS = {
   statusFieldId: 'PVTSSF_lADOBKF3Cs4AfDv2zgUgpnk',
 }
 
+
+// Product delivery projects
+
 // project id: 95
 export const IDENTITY = {
   projectId: 'PVT_kwDOBKF3Cs4Ak_eq',
@@ -131,6 +136,7 @@ export const DBAAS = {
   projectId: 'PVT_kwDOBKF3Cs4AkjdS',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgcvnTs',
   teamLabelName: 'team/dbaas',
+  designStatusFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgfGXDk',
 }
 
 // project id: 89
