@@ -205,6 +205,11 @@ export class Issue {
       return;
     }
 
+    if (this.closed) {
+      logger("info", "skipping because issue is closed", this.title)
+      return;
+    }
+
     if (!isDryRun()) {
       try {
         const resp = await kit.graphql(setField, {
@@ -237,14 +242,14 @@ export class Issue {
       }
 
       logger("info", `processing ${issueData.repo}#${issueData.number}`);
-      let {data: issue} = await kit.request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
-        owner: this.owner_login,
-        repo: issueData.repo,
-        issue_number: issueData.number,
-      });
-
-      logger("info", `process ${issue.id}`, issue);
       try {
+        let {data: issue} = await kit.request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
+          owner: this.owner_login,
+          repo: issueData.repo,
+          issue_number: issueData.number,
+        });
+
+        logger("info", `process ${issue.id}`, issue);
         const zIssue = await Issue.load(kit, issue.node_id);
         res.push(zIssue);
         logger("info", `done processing ${issue.title}`);
