@@ -210,8 +210,6 @@ export const BAAS: ProductDeliveryTeamProject = {
 export const AI_EXPERIMENTS: ProductDeliveryTeamProject = {
   projectId: 'PVT_kwDOBKF3Cs4Ak7Jy',
   teamLabelName: 'team/ai',
-  // designStatusFieldId: '...',
-  // figmaLinkFieldId: '...',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4Ak7JyzgdDpRQ'
 }
 
@@ -219,9 +217,6 @@ export const AI_EXPERIMENTS: ProductDeliveryTeamProject = {
 export const QA: ProductDeliveryTeamProject = {
   projectId: 'PVT_kwDOBKF3Cs4Al5CB',
   teamLabelName: 'team/qa',
-  // designStatusFieldId: '...',
-  // figmaLinkFieldId: '...',
-  // roadmapTargetShipQuarterFieldId: '...'
 }
 
 // project id: 90
@@ -243,4 +238,22 @@ export const PRODUCT_DELIVERY = [
   QA,
   AI_EXPERIMENTS,
   AZURE
+]
+
+export const ALL_TEAMS_PROJECTS = [
+  ...PRODUCT_DELIVERY,
+  CONSOLE,
+  ENGINEERING,
+  PRODUCT_DESIGN,
+  INFRA,
+  AUTOSCALING,
+  CONTROL_PLANE,
+  DATA,
+  COMPUTE,
+  DOCS,
+  POSTGRES,
+  PRODUCT,
+  PIXEL_POINT,
+  ALL_EPICS,
+  NEON_RELEASE_STATUS,
 ]
