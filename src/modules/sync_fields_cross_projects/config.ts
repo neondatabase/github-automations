@@ -22,13 +22,13 @@ export const CONFIG: Record<string, SyncFieldsConfig> = {
         .filter(({designStatusFieldId}) => !!designStatusFieldId)
         .map(({projectId, designStatusFieldId}) => ({
           projectId,
-          designStatusFieldId,
+          fieldId: designStatusFieldId,
         })),
       [PRODUCT_DESIGN.figmaLinkFieldId]: PRODUCT_DELIVERY
         .filter(({figmaLinkFieldId}) => !!figmaLinkFieldId)
         .map(({projectId, figmaLinkFieldId}) => ({
           projectId,
-          figmaLinkFieldId,
+          fieldId: figmaLinkFieldId,
         }))
     }
   },
