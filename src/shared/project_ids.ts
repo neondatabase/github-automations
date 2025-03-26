@@ -213,6 +213,15 @@ export const AZURE: ProductDeliveryTeamProject = {
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4Ak7JtzgdDpNA'
 }
 
+// project id: 114
+export const FE_INFRA: ProductDeliveryTeamProject = {
+  projectId: 'PVT_kwDOBKF3Cs4A1Hgc',
+  teamLabelName: 'team/fe-infra',
+  designStatusFieldId: 'PVTF_lADOBKF3Cs4A1Hgczgqo69U',
+  figmaLinkFieldId: 'PVTF_lADOBKF3Cs4A1Hgczgqo69Y',
+  roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4A1Hgczgqo69c'
+}
+
 export const PRODUCT_DELIVERY = [
   BILLING,
   IDENTITY,
@@ -222,7 +231,8 @@ export const PRODUCT_DELIVERY = [
   GROWTH,
   QA,
   AI_EXPERIMENTS,
-  AZURE
+  AZURE,
+  FE_INFRA,
 ]
 
 export const ALL_TEAMS_PROJECTS = [
