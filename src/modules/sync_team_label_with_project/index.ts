@@ -2,7 +2,7 @@ import {
   AI_EXPERIMENTS, AZURE,
   BAAS,
   BILLING,
-  DBAAS,
+  DBAAS, FE_INFRA,
   GROWTH,
   IDENTITY, QA,
   WORKFLOW
@@ -38,6 +38,7 @@ const PROJECTS_TO_LABELS_MAP = {
   [AI_EXPERIMENTS.projectId]: AI_EXPERIMENTS.teamLabelName,
   [QA.projectId]: QA.teamLabelName,
   [AZURE.projectId]: AZURE.teamLabelName,
+  [FE_INFRA.projectId]: FE_INFRA.teamLabelName,
 }
 
 export const sync_team_label_with_project = (app: Probot) => {
