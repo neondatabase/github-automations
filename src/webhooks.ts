@@ -11,6 +11,7 @@ export = (app: Probot) => {
   l.status_last_updated_handler(app);
   l.sync_team_label_with_project(app)
   l.sync_fields_cross_projects(app);
+  l.sync_created_at(app);
 
   //
   // we can also:
