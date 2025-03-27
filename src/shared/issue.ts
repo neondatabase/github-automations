@@ -38,6 +38,8 @@ export class Issue {
   // {[projectId]: [nodeId]}
   connectedProjectItems: Record<string, string>
 
+  createdAt: string;
+
   constructor(node: any) {
     this.node_id = node.id;
     this.title = node.title;
@@ -52,6 +54,7 @@ export class Issue {
     this.owner_login = node.repository.owner.login;
     this.milestone = node.milestone;
     this.belongsToConsole = !!(node.labels?.nodes || []).find((l: any) => (l.name === 'c/console/ui'));
+    this.createdAt = node.createdAt;
 
     this.connectedProjectItems = {};
 

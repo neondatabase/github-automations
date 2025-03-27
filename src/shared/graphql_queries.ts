@@ -35,6 +35,7 @@ export const issueWithParents = `
           title
           body
           number
+          createdAt
           milestone {
             id
             dueOn
