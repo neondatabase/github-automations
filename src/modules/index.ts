@@ -6,3 +6,4 @@ export * from './status_last_updated_handler';
 export * from './sync_team_label_with_project'
 export * from './sync_fields_cross_projects';
 export * from './sync_created_at';
+export * from './sync_updated_at'
