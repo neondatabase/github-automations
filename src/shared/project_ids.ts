@@ -11,6 +11,7 @@ interface NeonProject {
   statusLastUpdatedFieldId?: string;
   createdAtFieldId?: string;
   updatedAtFieldId?: string;
+  closedAtFieldId?: string;
 }
 
 // project id: 8
@@ -156,6 +157,7 @@ export const DBAAS: ProductDeliveryTeamProject = {
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgfNlKw',
   createdAtFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgq2BWI',
   updatedAtFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgq2BaU',
+  closedAtFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgq2TQ0',
 }
 
 // project id: 89

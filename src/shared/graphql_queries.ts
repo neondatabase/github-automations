@@ -205,3 +205,15 @@ export const setDateField = `
       }
     }
   `
+
+export const clearFieldValue = `
+  mutation ($project_id: ID!, $project_item_id: ID!, $field_id: ID!) {
+      clearProjectV2ItemFieldValue(input: {
+        projectId: $project_id,
+        itemId: $project_item_id,
+        fieldId: $field_id,
+      }) {
+        projectV2Item { id }
+      }
+    }
+`

@@ -13,6 +13,7 @@ export = (app: Probot) => {
   l.sync_fields_cross_projects(app);
   l.sync_created_at(app);
   l.sync_updated_at(app);
+  l.sync_closed_at(app)
 
   //
   // we can also:
