@@ -3,6 +3,7 @@ import {logger} from "../../shared/logger";
 import {isDryRun} from "../../shared/utils";
 import {ALL_TEAMS_PROJECTS} from "../../shared/project_ids";
 import {setDateField} from "../../shared/graphql_queries";
+import {Issue} from "../../shared/issue";
 
 const config = ALL_TEAMS_PROJECTS
   .filter(pr => !!pr.updatedAtFieldId)
@@ -10,8 +11,8 @@ const config = ALL_TEAMS_PROJECTS
     return { projectId, updatedAtFieldId }
   });
 
-// Syncs "Created at" field for project item from the issue.
-// Important: The value that will be set is when the issue was created, not when the issue was added to the project.
+// Syncs "Updated at" field for project item.
+// Important: The value that will be set is when the project item or issue description or title was updated.
 
 export const sync_updated_at = (app: Probot) => {
   app.on(["projects_v2_item.edited"], async (context) => {
@@ -53,4 +54,47 @@ export const sync_updated_at = (app: Probot) => {
       logger('error', `failed to update updatedAt for project item '${projectItemId}' in project ${projectId}`, e);
     }
   });
+
+  app.on("issues.edited", async (context) => {
+    if (context.payload.sender.type === 'Bot') {
+      logger('info', 'skip "sync_updated_at" because sender is a bot');
+      return;
+    }
+
+    let issue: Issue;
+    try {
+      issue = await Issue.load(context.octokit, context.payload.issue.node_id);
+
+    } catch (e) {
+      logger('error', `failed to load issue #${context.payload.repository.name}/${context.payload.issue.id}`, e);
+      return;
+    }
+
+    const updatedAt = context.payload.issue.updated_at;
+
+    for (let projectId in issue.connectedProjectItems) {
+      const projectItemId = issue.connectedProjectItems[projectId];
+      const projectConfig = config.find(c => c.projectId === projectId);
+      if (!projectConfig) {
+        logger('info', `skip because syncing \`updated_at\` is not configured for project ${projectId}`);
+        break;
+      }
+
+      try {
+        logger('info', `setting updatedAt for item #${projectItemId} in project ${projectId}`);
+
+        if (!isDryRun()) {
+          await context.octokit.graphql(setDateField, {
+            project_id: projectId,
+            project_item_id: projectItemId,
+            date_field_id: projectConfig.updatedAtFieldId,
+            value: updatedAt,
+          });
+        }
+        logger('info', `updatedAt has been updated for project item '${projectItemId}' with value '${updatedAt}'`);
+      } catch (e) {
+        logger('error', `failed to update updatedAt for project item '${projectItemId}' in project ${projectId}`, e);
+      }
+    }
+  })
 }
