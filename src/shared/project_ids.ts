@@ -10,6 +10,7 @@ interface NeonProject {
   figmaLinkFieldId?: string;
   statusLastUpdatedFieldId?: string;
   createdAtFieldId?: string;
+  updatedAtFieldId?: string;
 }
 
 // project id: 8
@@ -154,6 +155,7 @@ export const DBAAS: ProductDeliveryTeamProject = {
   figmaLinkFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgfNck4',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgfNlKw',
   createdAtFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgq2BWI',
+  updatedAtFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgq2BaU',
 }
 
 // project id: 89
