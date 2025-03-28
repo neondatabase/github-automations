@@ -1,16 +1,12 @@
 import {Probot} from "probot";
 import {Issue} from "../../shared/issue";
 import {
-  AUTOSCALING, COMPUTE,
-  CONSOLE,
-  CONTROL_PLANE, DATA,
-  DBAAS,
-  DOCS,
-  ENGINEERING,
-  IDENTITY,
-  INFRA, PIXEL_POINT, POSTGRES, PRODUCT,
-  PRODUCT_DESIGN,
-  WORKFLOW
+  CONTROL_PLANE, AUTOSCALING, COMPUTE, STORAGE, PROXY,
+  SRE,
+  BILLING, IDENTITY, DBAAS, BAAS, WORKFLOW, AZURE, FE_INFRA, QA, SUPPORT_TOOLS,
+  DATA, DOCS,
+  ENGINEERING, CONSOLE,
+  PIXEL_POINT, POSTGRES, PRODUCT
 } from "../../shared/project_ids";
 import {Octokit} from "@octokit/core";
 import {logger} from "../../shared/logger";
@@ -22,23 +18,26 @@ const FIELD_IDS_BY_PROJECT_ID = {
   [ENGINEERING.projectId]: {
     trackedIn: ENGINEERING.trackedInFieldId,
   },
+  [SRE.projectId]: {
+    trackedIn: SRE.trackedInFieldId,
+  },
   [AUTOSCALING.projectId]: {
     trackedIn: AUTOSCALING.trackedInFieldId,
   },
-  [PRODUCT_DESIGN.projectId]: {
-    trackedIn: PRODUCT_DESIGN.trackedInFieldId,
-  },
   [CONTROL_PLANE.projectId]: {
     trackedIn: CONTROL_PLANE.trackedInFieldId,
-  },
-  [INFRA.projectId]: {
-    trackedIn: INFRA.trackedInFieldId,
   },
   [DATA.projectId]: {
     trackedIn: DATA.trackedInFieldId,
   },
   [COMPUTE.projectId]: {
     trackedIn: COMPUTE.trackedInFieldId,
+  },
+  [STORAGE.projectId]: {
+    trackedIn: STORAGE.trackedInFieldId,
+  },
+  [PROXY.projectId]: {
+    trackedIn: PROXY.trackedInFieldId,
   },
   [DOCS.projectId]: {
     trackedIn: DOCS.trackedInFieldId,
@@ -58,8 +57,26 @@ const FIELD_IDS_BY_PROJECT_ID = {
   [DBAAS.projectId]: {
     trackedIn: DBAAS.trackedInFieldId,
   },
+  [SUPPORT_TOOLS.projectId]: {
+    trackedIn: SUPPORT_TOOLS.trackedInFieldId,
+  },
   [WORKFLOW.projectId]: {
     trackedIn: WORKFLOW.trackedInFieldId,
+  },
+  [BILLING.projectId]: {
+    trackedIn: BILLING.trackedInFieldId,
+  },
+  [BAAS.projectId]: {
+    trackedIn: BAAS.trackedInFieldId,
+  },
+  [QA.projectId]: {
+    trackedIn: QA.trackedInFieldId,
+  },
+  [AZURE.projectId]: {
+    trackedIn: AZURE.trackedInFieldId,
+  },
+  [FE_INFRA.projectId]: {
+    trackedIn: FE_INFRA.trackedInFieldId,
   },
 }
 
