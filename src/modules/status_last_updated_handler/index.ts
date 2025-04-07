@@ -12,9 +12,14 @@ export const status_last_updated_handler = (app: Probot) => {
     // we use this event instead issue.edited because in this event we will get the project_node_id
     logger("info", "status_last_updated_handler fired with payload", context.payload);
     const projectId = context.payload.projects_v2_item.project_node_id;
+    if (!(Object.keys(config)).includes(projectId)) {
+      logger("info", 'status_last_updated_handler skipped because not configured for the project')
+      return;
+    }
     const statusFieldId = config[projectId].statusFieldId;
     const lastUpdatedFieldId = config[projectId].statusLastUpdatedFieldId;
-    if (!(Object.keys(config)).includes(projectId) || !statusFieldId || !lastUpdatedFieldId) {
+
+    if (!statusFieldId || !lastUpdatedFieldId) {
       logger("info", 'status_last_updated_handler skipped because not configured for the project')
       return;
     }
