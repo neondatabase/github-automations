@@ -217,3 +217,67 @@ export const clearFieldValue = `
       }
     }
 `
+
+export const getProjectItems = `
+query ($q: String!, $cursor: String!){
+  search(query: $q, type: ISSUE, first: 50, after: $cursor){
+    pageInfo {
+      endCursor,
+      hasNextPage,
+      startCursor,
+      hasPreviousPage,
+    }
+    issueCount
+    nodes {
+      ... on Issue {
+        number,
+        title,
+        createdAt,
+        updatedAt,
+        closedAt,
+        repository {
+          ... on Repository {
+            name
+          }
+        }
+        author {
+          ... on Actor {
+            login
+          }
+        }
+        projectItems(first: 10) {
+          ... on ProjectV2ItemConnection {
+            nodes{
+              ... on ProjectV2Item {
+                id,
+                isArchived,
+                type,
+                updatedAt,
+                project {
+                  ... on ProjectV2 {
+                    id
+                  }
+                }
+                fieldValues(first: 15) {
+                  nodes {
+                    ... on ProjectV2ItemFieldValueCommon {
+                      field {
+                          ... on ProjectV2FieldCommon {
+                            id
+                            name 
+                          }
+                        }
+                    }
+                    ... on ProjectV2ItemFieldDateValue {
+                      date
+                    }
+                  }
+                },
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`
