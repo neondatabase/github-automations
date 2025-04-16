@@ -220,7 +220,7 @@ export const clearFieldValue = `
 
 export const getProjectItems = `
 query ($q: String!, $cursor: String!){
-  search(query: $q, type: ISSUE, first: 50, after: $cursor){
+  search(query: $q, type: ISSUE, first: 100, after: $cursor){
     pageInfo {
       endCursor,
       hasNextPage,

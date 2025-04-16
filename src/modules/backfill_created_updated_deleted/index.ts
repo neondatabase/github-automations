@@ -1,4 +1,4 @@
-import {Probot, ProbotOctokit} from "probot";
+import {ProbotOctokit} from "probot";
 import {
   getProjectItems, setDateField,
 } from "../../shared/graphql_queries";
@@ -24,13 +24,7 @@ const config: Array<Pick<NeonProject, 'projectId' | 'projectNumber' | 'updatedAt
   }
 }).filter(pr => Boolean(pr)) as Array<Pick<NeonProject, 'projectId' | 'projectNumber' | 'updatedAtFieldId' | 'createdAtFieldId' | 'closedAtFieldId'>>;
 console.log(config)
-export const backfill_listener = (app: Probot) => {
-  app.on(["projects_v2_item"], async (context) => {
-    if (context.id === '24d1ea20-19e4-11f0-98f3-bffb5aa27e8a') {
-      backfill_created_updated_deleted(context.octokit);
-    }
-  });
-}
+
 export const backfill_created_updated_deleted = async (octokit: ProbotOctokit) => {
   console.time('backfill_created_updated_deleted')
   let graphqlCounter = 0;
@@ -39,6 +33,7 @@ export const backfill_created_updated_deleted = async (octokit: ProbotOctokit) =
     if (!project) {
       break;
     }
+    console.time('backfill_created_updated_deleted' + project.projectNumber)
     let pageInfo: {
       hasNextPage: boolean,
       endCursor: string,
@@ -50,7 +45,6 @@ export const backfill_created_updated_deleted = async (octokit: ProbotOctokit) =
       try {
         const res: {
           search: {
-
             pageInfo: {
               endCursor: string,
               hasNextPage: boolean,
@@ -93,9 +87,10 @@ export const backfill_created_updated_deleted = async (octokit: ProbotOctokit) =
             }>
           }
         } = await octokit.graphql(getProjectItems, {
-          q: `org:neondatabase repo:cloud project:neondatabase/${project.projectNumber}`,
+          q: `org:neondatabase project:neondatabase/${project.projectNumber} is:closed`,
           cursor: pageInfo.endCursor,
         });
+        logger('info', `total count: ${res.search.issueCount}`);
         const { search } = res;
         graphqlCounter++;
         logger('info', `processing page from cursor ${pageInfo.endCursor}, itemsCount: ${search.nodes.length}`);
@@ -209,6 +204,7 @@ export const backfill_created_updated_deleted = async (octokit: ProbotOctokit) =
     console.timeLog('backfill_created_updated_deleted', {
       projectNumber: project.projectNumber
     })
+    console.timeEnd('backfill_created_updated_deleted' + project.projectNumber)
   }
 
   console.timeEnd('backfill_created_updated_deleted')
