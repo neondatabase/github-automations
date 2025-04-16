@@ -14,6 +14,7 @@
   "scripts": {
     "build": "tsc",
     "start": "probot run ./lib/webhooks.js",
+    "start:backfill": "probot run ./lib/backfill.js",
     "test": "jest --detectOpenHandles"
   },
   "dependencies": {
