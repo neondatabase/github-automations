@@ -1,9 +1,9 @@
-import {Probot,} from "probot";
+import { Probot } from "probot";
 
 import * as l from "./modules";
 
 // webhooks entry point to the probot app
-export = async (app: Probot) => {
+export = (app: Probot) => {
   l.sync_roadmap_ship_target_with_subtasks_listener(app);
   l.engineering_projects_manager_listener(app);
   l.pull_request_label_change_listener(app);
