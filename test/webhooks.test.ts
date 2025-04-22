@@ -2,10 +2,12 @@ import nock from "nock";
 // Requiring our app implementation
 import myProbotApp from "../src/webhooks";
 import { Probot, ProbotOctokit } from "probot";
+import { describe, expect, test, beforeEach, afterEach } from 'vitest'
+
 // Requiring our fixtures
 
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
 
 const privateKey = fs.readFileSync(
   path.join(__dirname, "fixtures/mock-cert.pem"),
