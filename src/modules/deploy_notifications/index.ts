@@ -24,12 +24,13 @@ export const workflow_notifications_listener = (app: Probot) => {
       context.payload.action === 'completed'
       && context.payload.sender.login !== 'vipvap'
       && workflow_run
-      && [
+      && workflow_run.head_branch
+      && ([
         process.env.CONSOLE_PRODUCTION_BRANCH_NAME,
         process.env.CONSOLE_STAGING_BRANCH_NAME,
         process.env.NEON_STAGING_BRANCH_NAME,
         process.env.NEON_PRODUCTION_BRANCH_NAME,
-      ].includes(workflow_run.head_branch)
+      ]).includes(workflow_run.head_branch)
       && workflow_run.event === 'push'
     ) {
       notificationsQueue.run(async () => {
