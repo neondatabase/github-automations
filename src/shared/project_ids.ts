@@ -1,4 +1,5 @@
-interface NeonProject {
+export interface NeonProject {
+  projectNumber: number;
   projectId: string;
   trackedInFieldId?: string;
   forceSyncFieldId?: string;
@@ -16,6 +17,7 @@ interface NeonProject {
 
 // project id: 8
 export const NEON_PRIVATE_ROADMAP: NeonProject = {
+  projectNumber: 8,
   projectId: "PVT_kwDOBKF3Cs4ADWZl",
   targetShipQuarterFieldId: "PVTIF_lADOBKF3Cs4ADWZlzgJK-lA",
   forceSyncFieldId: 'PVTF_lADOBKF3Cs4ADWZlzgKz5cA',
@@ -25,6 +27,7 @@ export const NEON_PRIVATE_ROADMAP: NeonProject = {
 // project id: 21
 // project not in use, clean up?
 export const CONSOLE: NeonProject = {
+  projectNumber: 21,
   projectId: "PVT_kwDOBKF3Cs4AMKWT",
   trackedInFieldId: 'PVTF_lADOBKF3Cs4AMKWTzgHwfhM',
   progressFieldId: 'PVTF_lADOBKF3Cs4AMKWTzgHwfhU',
@@ -34,6 +37,7 @@ export const CONSOLE: NeonProject = {
 // project id: 6
 // project not in use, clean up?
 export const ENGINEERING: NeonProject = {
+  projectNumber: 6,
   projectId: 'PVT_kwDOBKF3Cs1e-g',
   trackedInFieldId: 'PVTF_lADOBKF3Cs1e-s4AB3Qt',
   progressFieldId: 'PVTF_lADOBKF3Cs1e-s4ADvDB',
@@ -46,6 +50,7 @@ interface DesignProject extends NeonProject {
 
 // project id: 17
 export const PRODUCT_DESIGN: DesignProject = {
+  projectNumber: 17,
   projectId: 'PVT_kwDOBKF3Cs4AL_Xj',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AL_XjzgKe_xI',
   statusFieldId: 'PVTSSF_lADOBKF3Cs4AL_XjzgHpb8U',
@@ -58,6 +63,7 @@ export const PRODUCT_DESIGN: DesignProject = {
 
 // project id: 14
 export const DATA: NeonProject = {
+  projectNumber: 14,
   projectId: 'PVT_kwDOBKF3Cs4ALGJW',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4ALGJWzgL3Pu8',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4ALGJWzgL3RAY',
@@ -68,6 +74,7 @@ export const DATA: NeonProject = {
 
 // project id: 25
 export const DOCS: NeonProject = {
+  projectNumber: 25,
   projectId: 'PVT_kwDOBKF3Cs4ANGVj',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4ANGVjzgL3PwQ',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4ANGVjzgL3RHs',
@@ -78,6 +85,7 @@ export const DOCS: NeonProject = {
 
 // project id: 50
 export const AUTOSCALING: NeonProject = {
+  projectNumber: 50,
   projectId: 'PVT_kwDOBKF3Cs4ASNuf',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4ASNufzgLodD0',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4ASNufzgLodDY',
@@ -89,6 +97,7 @@ export const AUTOSCALING: NeonProject = {
 
 // project id: 48
 export const CONTROL_PLANE: NeonProject = {
+  projectNumber: 48,
   projectId: 'PVT_kwDOBKF3Cs4ASIxL',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4ASIxLzgLlRoA',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4ASIxLzgLlRnk',
@@ -99,6 +108,7 @@ export const CONTROL_PLANE: NeonProject = {
 
 // project id: 49
 export const COMPUTE: NeonProject = {
+  projectNumber: 49,
   projectId: 'PVT_kwDOBKF3Cs4ASNk7',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4ASNk7zgLoW6k',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4ASNk7zgLoW6I',
@@ -109,6 +119,7 @@ export const COMPUTE: NeonProject = {
 
 // project id: 51
 export const STORAGE: NeonProject = {
+  projectNumber: 51,
   projectId: 'PVT_kwDOBKF3Cs4AS3LL',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AS3LLzgMC_kM',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4AS3LLzgMC_kE',
@@ -119,6 +130,7 @@ export const STORAGE: NeonProject = {
 
 // project id: 65
 export const PROXY: NeonProject = {
+  projectNumber: 65,
   projectId: 'PVT_kwDOBKF3Cs4AUpZ9',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AUpZ9zgNMQiY',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4AUpZ9zgNMQiE',
@@ -129,6 +141,7 @@ export const PROXY: NeonProject = {
 
 // project id: 72
 export const SECURITY: NeonProject = {
+  projectNumber: 72,
   projectId: 'PVT_kwDOBKF3Cs4AVPsD',
   createdAtFieldId: 'PVTF_lADOBKF3Cs4AVPsDzgq6f4M',
   updatedAtFieldId: 'PVTF_lADOBKF3Cs4AVPsDzgq6f7Q',
@@ -137,6 +150,7 @@ export const SECURITY: NeonProject = {
 
 // project id: 37
 export const SRE: NeonProject = {
+  projectNumber: 37,
   projectId: 'PVT_kwDOBKF3Cs4AQhn_',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AQhn_zgq6cLk',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4AQhn_zgKjQK4',
@@ -147,6 +161,7 @@ export const SRE: NeonProject = {
 
 // project id: 83
 export const SUPPORT_ESCALATIONS: NeonProject = {
+  projectNumber: 83,
   projectId: 'PVT_kwDOBKF3Cs4Aj1E_',
   createdAtFieldId: 'PVTF_lADOBKF3Cs4Aj1E_zgq6gVA',
   updatedAtFieldId: 'PVTF_lADOBKF3Cs4Aj1E_zgq6gZo',
@@ -155,6 +170,7 @@ export const SUPPORT_ESCALATIONS: NeonProject = {
 
 // project id: 104
 export const PERFORMANCE_CORRECTNESS: NeonProject = {
+  projectNumber: 104,
   projectId: 'PVT_kwDOBKF3Cs4As3oj',
   createdAtFieldId: 'PVTF_lADOBKF3Cs4As3ojzgq6gxU',
   updatedAtFieldId: 'PVTF_lADOBKF3Cs4As3ojzgq6g1Q',
@@ -163,6 +179,7 @@ export const PERFORMANCE_CORRECTNESS: NeonProject = {
 
 // project id: 80
 export const DEVPROD: NeonProject = {
+  projectNumber: 80,
   projectId: 'PVT_kwDOBKF3Cs4AfHq7',
   createdAtFieldId: 'PVTF_lADOBKF3Cs4AfHq7zgq6bOA',
   updatedAtFieldId: 'PVTF_lADOBKF3Cs4AfHq7zgq6bPk',
@@ -172,6 +189,7 @@ export const DEVPROD: NeonProject = {
 // project id: 32
 // unclear if project is in use
 export const POSTGRES: NeonProject = {
+  projectNumber: 32,
   projectId: 'PVT_kwDOBKF3Cs4AQQPR',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AQQPRzgL3QBI',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4AQQPRzgL3RLg',
@@ -180,6 +198,7 @@ export const POSTGRES: NeonProject = {
 // project id: 11
 // project is inactive
 export const PRODUCT: NeonProject = {
+  projectNumber: 11,
   projectId: 'PVT_kwDOBKF3Cs4AHA73',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AHA73zgL3Pzo',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4AHA73zgL3RSk',
@@ -188,6 +207,7 @@ export const PRODUCT: NeonProject = {
 // project id: 10
 // projects is inactive
 export const PIXEL_POINT: NeonProject = {
+  projectNumber: 10,
   projectId: 'PVT_kwDOBKF3Cs4AFa_n',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AFa_nzgL3Q_s',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4AFa_nzgL3Raw',
@@ -196,12 +216,14 @@ export const PIXEL_POINT: NeonProject = {
 // project id: 64
 // project is inactive
 export const ALL_EPICS: NeonProject = {
+  projectNumber: 64,
   projectId: 'PVT_kwDOBKF3Cs4AUkqb',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4AUkqbzgNJOys',
 }
 
 // project id: 79
 export const NEON_RELEASE_STATUS: NeonProject = {
+  projectNumber: 79,
   projectId: 'PVT_kwDOBKF3Cs4AfDv2',
   statusLastUpdatedFieldId: 'PVTF_lADOBKF3Cs4AfDv2zgZ0RRw',
   statusFieldId: 'PVTSSF_lADOBKF3Cs4AfDv2zgUgpnk',
@@ -218,6 +240,7 @@ interface ProductDeliveryTeamProject extends NeonProject {
 // project id: 91
 //consider removing, team not active
 export const AI_EXPERIMENTS: ProductDeliveryTeamProject = {
+  projectNumber: 91,
   projectId: 'PVT_kwDOBKF3Cs4Ak7Jy',
   teamLabelName: 'team/ai',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4Ak7JyzgdDpRQ',
@@ -225,6 +248,7 @@ export const AI_EXPERIMENTS: ProductDeliveryTeamProject = {
 
 // project id: 90
 export const AZURE: ProductDeliveryTeamProject = {
+  projectNumber: 90,
   projectId: 'PVT_kwDOBKF3Cs4Ak7Jt',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4Ak7JtzgdDpMo',
   teamLabelName: 'team/azure',
@@ -238,6 +262,7 @@ export const AZURE: ProductDeliveryTeamProject = {
 
 // project id: 88
 export const BAAS: ProductDeliveryTeamProject = {
+  projectNumber: 88,
   projectId: 'PVT_kwDOBKF3Cs4Ak7JT',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4Ak7JTzgdDo1k',
   teamLabelName: 'team/baas',
@@ -251,6 +276,7 @@ export const BAAS: ProductDeliveryTeamProject = {
 
 // project id: 93
 export const BILLING: ProductDeliveryTeamProject = {
+  projectNumber: 93,
   projectId: 'PVT_kwDOBKF3Cs4Ak7J2',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4Ak7J2zgdDpVU',
   teamLabelName: 'team/billing 💰',
@@ -264,6 +290,7 @@ export const BILLING: ProductDeliveryTeamProject = {
 
 // project id: 87
 export const DBAAS: ProductDeliveryTeamProject = {
+  projectNumber: 87,
   projectId: 'PVT_kwDOBKF3Cs4AkjdS',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgcvnTs',
   teamLabelName: 'team/dbaas',
@@ -277,6 +304,7 @@ export const DBAAS: ProductDeliveryTeamProject = {
 
 // project id: 114
 export const FE_INFRA: ProductDeliveryTeamProject = {
+  projectNumber: 114,
   projectId: 'PVT_kwDOBKF3Cs4A1Hgc',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4A1Hgczgq6UpI',
   teamLabelName: 'team/fe-infra',
@@ -290,6 +318,7 @@ export const FE_INFRA: ProductDeliveryTeamProject = {
 
 // project id: 85
 export const GROWTH: ProductDeliveryTeamProject = {
+  projectNumber: 85,
   projectId: 'PVT_kwDOBKF3Cs4AkUgD',
   teamLabelName: 'team/growth',
   designStatusFieldId: 'PVTF_lADOBKF3Cs4AkUgDzgfOUuY',
@@ -302,6 +331,7 @@ export const GROWTH: ProductDeliveryTeamProject = {
 
 // project id: 95
 export const IDENTITY: ProductDeliveryTeamProject = {
+  projectNumber: 95,
   projectId: 'PVT_kwDOBKF3Cs4Ak_eq',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4Ak_eqzgdHTgc',
   teamLabelName: 'team/identity 🆔',
@@ -315,6 +345,7 @@ export const IDENTITY: ProductDeliveryTeamProject = {
 
 // project id: 105
 export const SUPPORT_TOOLS: ProductDeliveryTeamProject = {
+  projectNumber: 105,
   projectId: 'PVT_kwDOBKF3Cs4Atql6',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4Atql6zgkY3WU',
   teamLabelName: 'team/support-tools',
@@ -328,6 +359,7 @@ export const SUPPORT_TOOLS: ProductDeliveryTeamProject = {
 
 // project id: 89
 export const WORKFLOW: ProductDeliveryTeamProject = {
+  projectNumber: 89,
   projectId: 'PVT_kwDOBKF3Cs4Ak7Jm',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4Ak7JmzgdDpF0',
   teamLabelName: 'team/workflow',
@@ -340,6 +372,7 @@ export const WORKFLOW: ProductDeliveryTeamProject = {
 }
 // project id: 98
 export const QA: ProductDeliveryTeamProject = {
+  projectNumber: 98,
   projectId: 'PVT_kwDOBKF3Cs4Al5CB',
   trackedInFieldId: 'PVTF_lADOBKF3Cs4Al5CBzgd3-EQ',
   teamLabelName: 'team/qa',

@@ -8,3 +8,4 @@ export * from './sync_fields_cross_projects';
 export * from './sync_created_at';
 export * from './sync_updated_at'
 export * from './sync_closed_at'
+export * from './backfill_created_updated_deleted';
