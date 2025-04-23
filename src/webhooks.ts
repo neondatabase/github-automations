@@ -14,7 +14,7 @@ export = (app: Probot) => {
   l.sync_created_at(app);
   l.sync_updated_at(app);
   l.sync_closed_at(app)
-
+  l.has_parent_in_project_listener(app)
   //
   // we can also:
   // * send notifications on commit/pr/issue/etc

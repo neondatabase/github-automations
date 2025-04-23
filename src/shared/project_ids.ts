@@ -13,6 +13,7 @@ export interface NeonProject {
   createdAtFieldId?: string;
   updatedAtFieldId?: string;
   closedAtFieldId?: string;
+  hasParentInProjectFieldId?: string;
 }
 
 // project id: 8
@@ -300,6 +301,7 @@ export const DBAAS: ProductDeliveryTeamProject = {
   createdAtFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgq2BWI',
   updatedAtFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgq2BaU',
   closedAtFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgq2TQ0',
+  hasParentInProjectFieldId: 'PVTF_lADOBKF3Cs4AkjdSzgsjGO0',
 }
 
 // project id: 114
