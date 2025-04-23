@@ -40,8 +40,8 @@ export const item_added_restored_deleted_listener = async (context: EmitterWebho
     id: issueNodeId
   });
 
-  // check for parent in project
-  if (issue.parent) {
+  // check for parent in project and update if parent belongs to the same project
+  if (issue.parent &&  (context.payload.action === 'created' || context.payload.action === 'restored')) {
     const parentProjectItem = issue.parent.projectItems.nodes.find((prItem: any) => (
       prItem.project.id === projectId
     ));
