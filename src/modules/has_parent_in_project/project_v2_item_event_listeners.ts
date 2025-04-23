@@ -41,7 +41,7 @@ export const item_added_restored_deleted_listener = async (context: EmitterWebho
   });
 
   // check for parent in project and update if parent belongs to the same project
-  if (issue.parent &&  (context.payload.action === 'created' || context.payload.action === 'restored')) {
+  if (issue.parent && (context.payload.action === 'created' || context.payload.action === 'restored')) {
     const parentProjectItem = issue.parent.projectItems.nodes.find((prItem: any) => (
       prItem.project.id === projectId
     ));
@@ -58,6 +58,16 @@ export const item_added_restored_deleted_listener = async (context: EmitterWebho
 
     if (!projectItem) {
       context.log.info(`skip because subissue ${subIssue.id} doesn't belong to the same project as parent`)
+      continue;
+    }
+
+    if (projectItem.isArchived) {
+      context.log.info(`skip because subissue ${subIssue.id} is archived`)
+      continue;
+    }
+
+    if (projectItem.type !== "Issue") {
+      context.log.info(`skip because subissue ${subIssue.id} type is not an issue`)
       continue;
     }
 

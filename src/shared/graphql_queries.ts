@@ -159,6 +159,8 @@ export type IssueProjectV2Items = {
     projectItems: {
       nodes: Array<{
         id: string;
+        isArchived: boolean,
+        type: "Issue" | string,
         project: {
           id: string,
           title: string,

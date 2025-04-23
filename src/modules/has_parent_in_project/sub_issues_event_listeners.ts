@@ -20,6 +20,16 @@ export const sub_issues_parent_issue_added_listener = async (context: EmitterWeb
   });
 
   for (let projectItem of subIssueProjectItems.projectItems.nodes) {
+    if (projectItem.isArchived) {
+      context.log.info("Skip because item is archived");
+      continue;
+    }
+
+    if (projectItem.type !== 'Issue') {
+      context.log.info("Skip because item is type is not an issue");
+      continue;
+    }
+
     const projectId = projectItem.project.id;
     const fieldId = config[projectId];
 
@@ -28,18 +38,17 @@ export const sub_issues_parent_issue_added_listener = async (context: EmitterWeb
       continue;
     }
 
-    // todo: skip if the item of subIssue is archived in the project
-
-    const parentIssueInProject = parentProjectConnections.projectItems.nodes.find(prItem => (
+    const parentIssueInProject = parentProjectConnections.projectItems && parentProjectConnections.projectItems.nodes && parentProjectConnections.projectItems.nodes.find(prItem => (
       prItem.project.id === projectId
     ));
 
     if (!parentIssueInProject) {
+      await clearFieldForProjectItem(context, projectItem, fieldId)
       context.log.info(`Skip because parent does not belong to the project ${projectId}`);
-      continue;
+    } else {
+      await setFieldForProjectItem(context, projectItem, fieldId);
     }
 
-    await setFieldForProjectItem(context, projectItem, fieldId);
   }
 }
 
@@ -51,6 +60,16 @@ export const sub_issues_parent_issue_removed_listener = async (context: EmitterW
   });
 
   for (let projectItem of subIssueProjectItems.projectItems.nodes) {
+    if (projectItem.isArchived) {
+      context.log.info("Skip because item is archived");
+      continue;
+    }
+
+    if (projectItem.type !== 'Issue') {
+      context.log.info("Skip because item is type is not an issue");
+      continue;
+    }
+
     const projectId = projectItem.project.id;
     const fieldId = config[projectId];
 
