@@ -312,6 +312,61 @@ query ($q: String!, $cursor: String!){
   }
 }`
 
+export const getProjectItemsWithParents = `
+query ($q: String!, $cursor: String!){
+  search(query: $q, type: ISSUE, first: 100, after: $cursor){
+    pageInfo {
+      endCursor,
+      hasNextPage,
+      startCursor,
+      hasPreviousPage,
+    }
+    issueCount
+    nodes {
+      ... on Issue {
+        number,
+        title,
+        parent {
+          id,
+          projectItems(first: 10) {
+            ... on ProjectV2ItemConnection {
+              nodes{
+                ... on ProjectV2Item {
+                  id,
+                  isArchived,
+                  type,
+                  project {
+                    ... on ProjectV2 {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        projectItems(first: 10) {
+          ... on ProjectV2ItemConnection {
+            nodes{
+              ... on ProjectV2Item {
+                id,
+                isArchived,
+                type,
+                project {
+                  ... on ProjectV2 {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`
+
+
 export const issueData = `
 query($id: ID!){
   node(id: $id) {
