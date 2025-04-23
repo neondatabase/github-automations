@@ -9,7 +9,7 @@ const slackClient = new WebClient(process.env.SLACK_TOKEN || '');
 const isConsoleRepo = (workflow_run: any) => (workflow_run.repository.name === 'cloud')
 const isNeonRepo = (workflow_run: any) => (workflow_run.repository.name === 'neon')
 
-export const getEnvChannelName = (workflow_run: { head_branch?: string }) => {
+export const getEnvChannelName = (workflow_run: { head_branch?: string | null }) => {
   if (isConsoleRepo(workflow_run)) {
     if (workflow_run.head_branch === process.env.CONSOLE_PRODUCTION_BRANCH_NAME) {
       return process.env.SLACK_DEPLOY_NOTIFICATIONS_CHANNEL_PRODUCTION

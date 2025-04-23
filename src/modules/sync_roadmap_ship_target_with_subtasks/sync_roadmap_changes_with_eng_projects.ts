@@ -75,6 +75,18 @@ export const handleRoadmapProjectItemChange = async (context: EmitterWebhookEven
     return;
   }
 
+  if (!context.payload.changes || !context.payload.changes.field_value || !context.payload.changes.field_value.field_node_id) {
+    logger("info", 'skipping because changes not found');
+    return;
+  }
+   if(!context.payload.projects_v2_item.node_id) {
+     logger("info", 'skipping because projects_v2_item.node_id not found');
+
+     return;
+   }
+
+  const fieldValue = context.payload.changes.field_value;
+
   logger("info", 'changed field id', context.payload.changes.field_value.field_node_id);
   logger("info", 'force sync field id', NEON_PRIVATE_ROADMAP.forceSyncFieldId)
 
@@ -82,7 +94,7 @@ export const handleRoadmapProjectItemChange = async (context: EmitterWebhookEven
 
   const mapping = isForceSyncFieldChanged
     ? FIELDS_MAPPING
-    : FIELDS_MAPPING.filter(item => item.from === context.payload.changes.field_value.field_node_id);
+    : FIELDS_MAPPING.filter(item => item.from === fieldValue.field_node_id);
 
   // logger("info", "changes", context.payload.changes)
   logger("info", "All mapping", FIELDS_MAPPING)

@@ -12,6 +12,11 @@ export const status_last_updated_handler = (app: Probot) => {
     // we use this event instead issue.edited because in this event we will get the project_node_id
     logger("info", "status_last_updated_handler fired with payload", context.payload);
     const projectId = context.payload.projects_v2_item.project_node_id;
+    if (!projectId) {
+      logger("info", 'status_last_updated_handler skipped because projectId is undefined')
+      return;
+    }
+
     const statusFieldId = config[projectId].statusFieldId;
     const lastUpdatedFieldId = config[projectId].statusLastUpdatedFieldId;
     if (!(Object.keys(config)).includes(projectId) || !statusFieldId || !lastUpdatedFieldId) {
@@ -19,7 +24,14 @@ export const status_last_updated_handler = (app: Probot) => {
       return;
     }
 
+    if (context.payload.action === "edited" && (!context.payload.changes || !context.payload.changes.field_value)) {
+      logger("info", 'status_last_updated_handler skipped because changes not found')
+      return;
+    }
+
     if (context.payload.action === "edited"
+      && context.payload.changes
+      && context.payload.changes.field_value
       && context.payload.changes.field_value.field_node_id !== statusFieldId) {
       logger("info", 'status_last_updated_handler skipped because changes are not in status field')
       return;

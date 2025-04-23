@@ -2,7 +2,7 @@ import { Octokit } from "@octokit/core";
 import type { GraphQlQueryResponseData } from "@octokit/graphql";
 import { isDryRun } from "./utils";
 
-import { Milestone } from "@octokit/webhooks-types"
+import { components as GHComponents } from "@octokit/openapi-types"
 import {
   issueProjectV2Items,
   issueWithParents,
@@ -14,6 +14,8 @@ interface IssueData {
   repo: string;
   number: number;
 }
+
+type Milestone = GHComponents['schemas']['milestone'];
 
 export class Issue {
   node_id: string;

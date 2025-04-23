@@ -58,7 +58,7 @@ export const sync_fields_cross_projects = (app: Probot) => {
     }
     const projectId = context.payload.projects_v2_item.project_node_id;
 
-    if (!WATCH_PROJECT_IDS.includes(projectId)) {
+    if (!projectId || !WATCH_PROJECT_IDS.includes(projectId)) {
       return;
     }
     // check if item is created in one of the projects we sync things to

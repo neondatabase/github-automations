@@ -116,7 +116,7 @@ export const engineering_projects_manager_listener = (app: Probot) => {
 
   app.on(["projects_v2_item.created"], async (context) => {
     // we use this event instead issue.edited because in this event we will get the project_node_id
-    if (!(Object.keys(FIELD_IDS_BY_PROJECT_ID))
+    if (!context.payload.projects_v2_item.project_node_id || !(Object.keys(FIELD_IDS_BY_PROJECT_ID))
       .includes(context.payload.projects_v2_item.project_node_id)) {
       return;
     }

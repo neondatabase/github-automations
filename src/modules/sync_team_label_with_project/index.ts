@@ -50,6 +50,11 @@ export const sync_team_label_with_project = (app: Probot) => {
     }
 
     const projectId = context.payload.projects_v2_item.project_node_id;
+    if (!projectId) {
+      logger('info', 'skip because projectId is undefined');
+      return;
+    }
+
     const label = PROJECTS_TO_LABELS_MAP[projectId];
     const issueNumber = context.payload.projects_v2_item.content_node_id;
 
@@ -86,6 +91,12 @@ export const sync_team_label_with_project = (app: Probot) => {
 
     // add label
     const projectId = context.payload.projects_v2_item.project_node_id;
+
+    if (!projectId) {
+      logger('info', 'skip because projectId is undefined');
+      return;
+    }
+
     const label = PROJECTS_TO_LABELS_MAP[projectId];
     const issueNumber = context.payload.projects_v2_item.content_node_id;
 
@@ -122,6 +133,12 @@ export const sync_team_label_with_project = (app: Probot) => {
 
     // remove label
     const projectId = context.payload.projects_v2_item.project_node_id;
+
+    if (!projectId) {
+      logger('info', 'skip because projectId is undefined');
+      return;
+    }
+
     const label = PROJECTS_TO_LABELS_MAP[projectId];
     const issueNumber = context.payload.projects_v2_item.content_node_id;
 
