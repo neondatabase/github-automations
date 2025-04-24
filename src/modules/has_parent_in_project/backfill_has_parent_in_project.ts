@@ -27,7 +27,7 @@ export const backfill_has_parent_in_project = async (c: Pick<Context<EmitterWebh
       endCursor: string,
     } = {
       hasNextPage: true,
-      endCursor: 'Y3Vyc29yOjIwMA==',
+      endCursor: '',
     }
     while (pageInfo.hasNextPage) {
       try {
