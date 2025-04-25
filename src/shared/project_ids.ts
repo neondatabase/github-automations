@@ -298,7 +298,7 @@ export const BILLING: ProductDeliveryTeamProject = {
   createdAtFieldId: 'PVTF_lADOBKF3Cs4Ak7J2zgq6L7Q',
   updatedAtFieldId: 'PVTF_lADOBKF3Cs4Ak7J2zgq6L-I',
   closedAtFieldId: 'PVTF_lADOBKF3Cs4Ak7J2zgq6MB0',
-  hasParentInProjectFieldId: 'PVTF_lADOBKF3Cs4Ak7J2zgdDpVU',
+  hasParentInProjectFieldId: 'PVTF_lADOBKF3Cs4Ak7J2zgsrPgI',
 }
 
 // project id: 87
@@ -392,7 +392,7 @@ export const QA: ProductDeliveryTeamProject = {
   createdAtFieldId: 'PVTF_lADOBKF3Cs4Al5CBzgq6Veg',
   updatedAtFieldId: 'PVTF_lADOBKF3Cs4Al5CBzgq6Vgc',
   closedAtFieldId: 'PVTF_lADOBKF3Cs4Al5CBzgq6Vlc',
-  hasParentInProjectFieldId: 'PVTF_lADOBKF3Cs4Al5CBzgsrLvA',
+  hasParentInProjectFieldId: 'PVTF_lADOBKF3Cs4Al5CBzgssQA8',
 }
 
 
