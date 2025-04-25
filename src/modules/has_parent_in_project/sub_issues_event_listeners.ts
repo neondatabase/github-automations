@@ -25,7 +25,7 @@ export const sub_issues_parent_issue_added_listener = async (context: EmitterWeb
       continue;
     }
 
-    if (projectItem.type !== 'Issue') {
+    if (projectItem.type !== 'ISSUE') {
       context.log.info("Skip because item is type is not an issue");
       continue;
     }
@@ -65,7 +65,7 @@ export const sub_issues_parent_issue_removed_listener = async (context: EmitterW
       continue;
     }
 
-    if (projectItem.type !== 'Issue') {
+    if (projectItem.type !== 'ISSUE') {
       context.log.info("Skip because item is type is not an issue");
       continue;
     }
