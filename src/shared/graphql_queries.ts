@@ -153,6 +153,23 @@ query($project_item_id: ID!){
     }
   }
 }`
+
+export type IssueProjectV2Items = {
+  node: {
+    projectItems: {
+      nodes: Array<{
+        id: string;
+        isArchived: boolean,
+        type: "Issue" | string,
+        project: {
+          id: string,
+          title: string,
+        }
+      }>
+    }
+  }
+}
+
 export const issueProjectV2Items = `
 query($id: ID!){
   node(id: $id) {
@@ -162,6 +179,8 @@ query($id: ID!){
           nodes {
             ... on ProjectV2Item {
               id,
+              isArchived
+              type
               project {
                 ... on ProjectV2 {
                   id, title
@@ -200,6 +219,19 @@ export const setDateField = `
         itemId: $project_item_id,
         fieldId: $date_field_id,
         value: { date: $value }
+      }) {
+        projectV2Item { id }
+      }
+    }
+  `
+
+export const setNumberField = `
+  mutation ($project_id: ID!, $project_item_id: ID!, $field_id: ID!, $value: Float!) {
+      updateProjectV2ItemFieldValue(input: {
+        projectId: $project_id,
+        itemId: $project_item_id,
+        fieldId: $field_id,
+        value: { number: $value }
       }) {
         projectV2Item { id }
       }
@@ -281,3 +313,110 @@ query ($q: String!, $cursor: String!){
     }
   }
 }`
+
+export const getProjectItemsWithParents = `
+query ($q: String!, $cursor: String!){
+  search(query: $q, type: ISSUE, first: 100, after: $cursor){
+    pageInfo {
+      endCursor,
+      hasNextPage,
+      startCursor,
+      hasPreviousPage,
+    }
+    issueCount
+    nodes {
+      ... on Issue {
+        number,
+        title,
+        parent {
+          id,
+          projectItems(first: 10) {
+            ... on ProjectV2ItemConnection {
+              nodes{
+                ... on ProjectV2Item {
+                  id,
+                  isArchived,
+                  type,
+                  project {
+                    ... on ProjectV2 {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        projectItems(first: 10) {
+          ... on ProjectV2ItemConnection {
+            nodes{
+              ... on ProjectV2Item {
+                id,
+                isArchived,
+                type,
+                project {
+                  ... on ProjectV2 {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`
+
+
+export const issueData = `
+query($id: ID!){
+  node(id: $id) {
+    ... on Issue {
+      id,
+      parent {
+        id
+        projectItems(first: 100) {
+          ... on ProjectV2ItemConnection {
+            nodes {
+              ... on ProjectV2Item {
+                id,
+                isArchived
+                type
+                project {
+                  ... on ProjectV2 {
+                    id, title
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      subIssues(first: 100) {
+        nodes {
+          ... on Issue {
+            id,
+            projectItems(first: 100) {
+              ... on ProjectV2ItemConnection {
+                nodes {
+                  ... on ProjectV2Item {
+                    id,
+                    isArchived
+                    type
+                    project {
+                      ... on ProjectV2 {
+                        id, title
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+`

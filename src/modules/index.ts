@@ -9,3 +9,4 @@ export * from './sync_created_at';
 export * from './sync_updated_at'
 export * from './sync_closed_at'
 export * from './backfill_created_updated_deleted';
+export * from './has_parent_in_project';
