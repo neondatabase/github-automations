@@ -17,6 +17,7 @@ export const backfill_has_parent_in_project = async (c: Pick<Context<EmitterWebh
     if (!project) {
       continue;
     }
+    c.log.info('processing project', project);
     const fieldId = project.hasParentInProjectFieldId;
     if (!fieldId) {
       continue;
@@ -43,8 +44,12 @@ export const backfill_has_parent_in_project = async (c: Pick<Context<EmitterWebh
         pageInfo.endCursor = search.pageInfo.endCursor
         pageInfo.hasNextPage = search.pageInfo.hasNextPage
         for (let issue of search.nodes) {
-          const issueProjectItem = issue.projectItems && issue.projectItems.nodes && issue.projectItems.nodes.find((pr: any) => (pr.project.id === project.projectId))
           if (!issue.parent) {
+            continue;
+          }
+          const issueProjectItem = issue.projectItems && issue.projectItems.nodes && issue.projectItems.nodes.find((pr: any) => (pr.project.id === project.projectId))
+
+          if (issueProjectItem.isArchived || issueProjectItem.type !== "ISSUE") {
             continue;
           }
 
