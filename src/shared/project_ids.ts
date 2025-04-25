@@ -137,7 +137,7 @@ export const PROXY: NeonProject = {
   createdAtFieldId: 'PVTF_lADOBKF3Cs4AUpZ9zgq6fXo',
   updatedAtFieldId: 'PVTF_lADOBKF3Cs4AUpZ9zgq6faA',
   closedAtFieldId: 'PVTF_lADOBKF3Cs4AUpZ9zgq6fdE',
-  hasParentInProjectFieldId: 'PVTF_lADOBKF3Cs4AUpZ9zgNMQiE',
+  hasParentInProjectFieldId: 'PVTF_lADOBKF3Cs4AUpZ9zgsrP2w',
 }
 
 // project id: 72
