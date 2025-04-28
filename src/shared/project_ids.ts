@@ -14,6 +14,7 @@ export interface NeonProject {
   updatedAtFieldId?: string;
   closedAtFieldId?: string;
   hasParentInProjectFieldId?: string;
+  teamLabelName?: string;
 }
 
 // project id: 8

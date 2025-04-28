@@ -1,11 +1,5 @@
 import {
-  AI_EXPERIMENTS, AZURE,
-  BAAS,
-  BILLING,
-  DBAAS, FE_INFRA,
-  GROWTH,
-  IDENTITY, QA,
-  WORKFLOW
+  ALL_TEAMS_PROJECTS
 } from "../../shared/project_ids";
 import {Probot} from "probot";
 import {logger} from "../../shared/logger";
@@ -27,19 +21,14 @@ import {Issue} from "../../shared/issue";
 //    2.1. Use this filter:
 //         `is:issue state:open -project:neondatabase/<project_number> label:<team_label>`
 //    2.2. Select all issues, click 'Lables', select the <team_label> label to bulk remove it from selected issues
+const configArr = ALL_TEAMS_PROJECTS.filter(({projectId, teamLabelName}) => {
+  return !!projectId && !!teamLabelName;
+});
 
-const PROJECTS_TO_LABELS_MAP = {
-  [DBAAS.projectId]: DBAAS.teamLabelName,
-  [IDENTITY.projectId]: IDENTITY.teamLabelName,
-  [BILLING.projectId]: BILLING.teamLabelName,
-  [WORKFLOW.projectId]: WORKFLOW.teamLabelName,
-  [GROWTH.projectId]: GROWTH.teamLabelName,
-  [BAAS.projectId]: BAAS.teamLabelName,
-  [AI_EXPERIMENTS.projectId]: AI_EXPERIMENTS.teamLabelName,
-  [QA.projectId]: QA.teamLabelName,
-  [AZURE.projectId]: AZURE.teamLabelName,
-  [FE_INFRA.projectId]: FE_INFRA.teamLabelName,
-}
+// @ts-ignore
+const PROJECTS_TO_LABELS_MAP = Object.fromEntries(configArr.map(({projectId, teamLabelName}) => {
+  return [projectId, teamLabelName];
+}));
 
 export const sync_team_label_with_project = (app: Probot) => {
   app.on(["projects_v2_item.created"], async (context) => {
