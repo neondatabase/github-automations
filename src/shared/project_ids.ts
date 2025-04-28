@@ -240,7 +240,6 @@ export const NEON_RELEASE_STATUS: NeonProject = {
 
 // Product delivery projects
 interface ProductDeliveryTeamProject extends NeonProject {
-  teamLabelName: string;
   designStatusFieldId?: string;
   figmaLinkFieldId?: string;
 }
@@ -362,7 +361,7 @@ export const IDENTITY: ProductDeliveryTeamProject = {
 export const SUPPORT_TOOLS: ProductDeliveryTeamProject = {
   projectNumber: 105,
   projectId: 'PVT_kwDOBKF3Cs4Atql6',
-  teamLabelName: 'team/support-tools',
+  // teamLabelName: 'team/support-tools',
   designStatusFieldId: 'PVTF_lADOBKF3Cs4Atql6zgq6J-A',
   figmaLinkFieldId: 'PVTF_lADOBKF3Cs4Atql6zgq6J7M',
   roadmapTargetShipQuarterFieldId: 'PVTF_lADOBKF3Cs4Atql6zgkhPos',
