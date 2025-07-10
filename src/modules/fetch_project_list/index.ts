@@ -4,20 +4,6 @@ import {logger} from "../../shared/logger";
 import fs from "fs";
 import {FieldValue, ProjectItem, SearchResult, Issue} from "./types";
 
-// export const fetch_all = async (octokit: ProbotOctokit) => {
-//     console.time('backfill_created_updated_deleted')
-//     let graphqlCounter = 0;
-//     let backfilledItems = 0;
-//     for (let project of config) {
-//         if (!project) {
-//             break;
-//         }
-//         await fetch_project_list(project.projectNumber, octokit)
-//     }
-//
-//     console.timeEnd('backfill_created_updated_deleted')
-// }
-
 const searchCutOffArr = [
     // `created:>2025-07-01`, // test set
 
@@ -91,6 +77,27 @@ const prepareLabels = (issue: Issue) => {
         .map((labelNode) => labelNode.name);
 }
 
+const prepareBody = (issue: Issue, projectItems: ProjectItem[])=> {
+    const projectItemsFieldsText = "## Fields from Neon Github Projects\n\n" + projectItems.map((prItem: any) => {
+        let res = `||Field||Value||\n`;
+        res = res + prItem.fieldValues.nodes
+            .filter((fieldValue: any) => fieldValue.field && fieldValue.field.name && !fieldValue.field.name.includes('🔄') && fieldValue.field.name !== "Title")
+            .map((fieldValue: any) => (
+                `|${fieldValue.field.name}|${getFieldValue(fieldValue)}|`
+            )).join('\n')
+
+        return `${prItem.project.title}\n${res}`;
+    }).join('\n\n')
+
+    return escape(`[Original Github Issue from Neon](${issue.url}), created at ${issue.createdAt}\n\n${issue.body}\n\n${projectItemsFieldsText}`);
+}
+
+const prepareComponents = (issue:Issue) => {
+    return issue.labels.nodes
+        .filter((labelNode) => labelNode.name && labelNode.name.startsWith("c/"))
+        .map((labelNode) => labelNode.name.substring(2));
+}
+
 // get project item that is most likely to make progress
 const getMainProject = (projectItems: ProjectItem[]) => {
     return projectItems.find((prItem) => (tryGetFieldValue("status", prItem.fieldValues.nodes).toLowerCase() === 'in progress'))
@@ -147,6 +154,14 @@ export const fetch_project_list = async (octokit: ProbotOctokit) => {
         ]
     ]
 
+    const addException = (issue: Issue, reason: string) => {
+        exportExceptions.push([
+            issue.url,
+            issue.title,
+            reason
+        ]);
+    }
+
     console.time('fetch_project_list')
     let i = 0;
     for (let searchSlice of searchCutOffArr) {
@@ -180,20 +195,12 @@ export const fetch_project_list = async (octokit: ProbotOctokit) => {
                     i++;
                     // logger('info', `it. #${i} Processing issue ${issue.repository.name}#${issue.number} ${issue.title}`)
                     if (!(repoWhitelist).includes(issue.repository.name)) {
-                        exportExceptions.push([
-                            issue.url,
-                            issue.title,
-                            'Does not belong to repositories from the list: "cloud", "neon", "company_projects", "analytics", "neonctl", "autoscaling"'
-                        ])
+                        addException(issue, 'Does not belong to whitelisted repositories')
                         continue;
                     }
 
                     if (!issue.projectItems.nodes.length) {
-                        exportExceptions.push([
-                            issue.url,
-                            issue.title,
-                            'Does not belong to any projects'
-                        ]);
+                        addException(issue, 'Does not belong to any projects')
                         continue;
                     }
 
@@ -205,11 +212,7 @@ export const fetch_project_list = async (octokit: ProbotOctokit) => {
                         ))
 
                     if (!projectItems.length) {
-                        exportExceptions.push([
-                            issue.url,
-                            issue.title,
-                            'Does not belong to any open projects'
-                        ]);
+                        addException(issue, 'Does not belong to any open projects')
                         continue;
                     }
 
@@ -222,27 +225,18 @@ export const fetch_project_list = async (octokit: ProbotOctokit) => {
                     stats.maxProjectsItemsLength = Math.max(activeProjectItems.length, stats.maxProjectsItemsLength)
 
                     if (!activeProjectItems.length) {
-                        exportExceptions.push([
-                            issue.url,
-                            issue.title,
-                            'All the projects the issue belongs to are blacklisted'
-                        ]);
+                        addException(issue, 'All the projects the issue belongs to are blacklisted')
                         continue;
                     }
 
                     activeProjectItems = activeProjectItems
                         .filter((prItem) => {
                             const status = tryGetFieldValue('status', prItem.fieldValues.nodes)
-
                             return status && status.match(statusesWhiteListRegex)   // only allow certain statuses
                         })
 
                     if (!activeProjectItems.length) {
-                        exportExceptions.push([
-                            issue.url,
-                            issue.title,
-                            'No projects with whitelisted statuses'
-                        ]);
+                        addException(issue, 'No projects with whitelisted statuses')
                         continue;
                     }
 
@@ -250,9 +244,7 @@ export const fetch_project_list = async (octokit: ProbotOctokit) => {
                     const mainProjectItem = getMainProject(activeProjectItems);
 
                     // get components from labels
-                    const components = issue.labels.nodes
-                        .filter((labelNode) => labelNode.name && labelNode.name.startsWith("c/"))
-                        .map((labelNode) => labelNode.name.substring(2));
+                    const components = prepareComponents(issue);
                     stats.maxComponentsLength = Math.max(components.length, stats.maxComponentsLength)
                     components.length = MAX_COMPONENTS
 
@@ -272,19 +264,8 @@ export const fetch_project_list = async (octokit: ProbotOctokit) => {
                     const teamsStatuses = activeProjectItems.map((prItem) => (`${prItem.project.title}/${tryGetFieldValue('status', prItem.fieldValues.nodes) || 'unknown'}`));
                     teamsStatuses.length = MAX_TEAMS;
 
-                    // const projectItemsFieldsText = "## Fields from Neon Github Projects\n\n" + projectItems.map((prItem: any) => {
-                    //     let res = `||Field||Value||\n`;
-                    //     res = res + prItem.fieldValues.nodes
-                    //         .filter((fieldValue: any) => fieldValue.field && fieldValue.field.name && !fieldValue.field.name.includes('🔄') && fieldValue.field.name !== "Title")
-                    //         .map((fieldValue: any) => (
-                    //         `|${fieldValue.field.name}|${getFieldValue(fieldValue)}|`
-                    //     )).join('\n')
-                    //
-                    //     return `${prItem.project.title}\n${res}`;
-                    // }).join('\n\n')
-
                     const id = getIssueId(issue);
-                    // const body = escape(`[Original Github Issue from Neon](${issue.url}), created at ${issue.createdAt}\n\n${issue.body}\n\n${projectItemsFieldsText}`);
+                    const body = prepareBody(issue, projectItems);
                     const title = escape(`${issue.title}, ${id}`);
                     const author = issue.author.login // todo: map to databricks emails pending Crystal
                     let parent = '';
@@ -305,7 +286,7 @@ export const fetch_project_list = async (octokit: ProbotOctokit) => {
                         //     "title",
                             title,
                         //     "body",
-                            '',
+                            body,
                         //     "issueType",
                             issue.issueType ? issue.issueType.name : 'Task',
                         //     "author",
