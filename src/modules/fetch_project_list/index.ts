@@ -5,13 +5,13 @@ import fs from "fs";
 import {FieldValue, ProjectItem, SearchResult, Issue} from "./types";
 
 const searchCutOffArr = [
-    // `created:>2025-07-01`, // test set
+    `created:>2025-07-01`, // test set
 
-    `created:>2025-04-01`,
-    `created:2025-01-01..2025-04-01`,
-    `created:2024-07-01..2025-01-01`,
-    'created:2022-06-01..2024-07-01',
-    `created:<2022-06-01`,
+    // `created:>2025-04-01`,
+    // `created:2025-01-01..2025-04-01`,
+    // `created:2024-07-01..2025-01-01`,
+    // 'created:2022-06-01..2024-07-01',
+    // `created:<2022-06-01`,
 ]
 
 const repoWhitelist = [
@@ -96,6 +96,16 @@ const prepareComponents = (issue:Issue) => {
     return issue.labels.nodes
         .filter((labelNode) => labelNode.name && labelNode.name.startsWith("c/"))
         .map((labelNode) => labelNode.name.substring(2));
+}
+
+const prepareIssueType = (issue: Issue) => {
+    // todo
+
+    if (issue.repository.name === "company_projects") {
+        return "Major Initiative"
+    }
+
+    return issue.issueType.name || 'Task';
 }
 
 // get project item that is most likely to make progress
@@ -277,6 +287,8 @@ export const fetch_project_list = async (octokit: ProbotOctokit) => {
                         continue;
                     }
 
+                    const issueType = prepareIssueType(issue);
+
                     exportData.push(
                         [
                         //     "url",
@@ -288,7 +300,7 @@ export const fetch_project_list = async (octokit: ProbotOctokit) => {
                         //     "body",
                             body,
                         //     "issueType",
-                            issue.issueType ? issue.issueType.name : 'Task',
+                            issueType,
                         //     "author",
                             author,
                         //     "parent",
