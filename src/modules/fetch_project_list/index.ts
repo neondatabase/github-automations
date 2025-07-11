@@ -288,16 +288,16 @@ export const fetch_project_list = async (octokit: ProbotOctokit) => {
                         const projectsStr = issue.projectItems.nodes
                             .map((prItem) => {
                                 if (prItem.project.closedAt) {
-                                    `${prItem.project.title}: project closed at ${prItem.project.closedAt}`
+                                    `"${prItem.project.title}": project closed at ${prItem.project.closedAt}`
                                 }
                                 if (prItem.isArchived) {
-                                    return `${prItem.project.title}: issue archived`
+                                    return `"${prItem.project.title}": issue archived`
                                 }
                                 if (projectsBlacklist.includes(prItem.project.title)) {
-                                    return `${prItem.project.title} is not whitelisted`
+                                    return `"${prItem.project.title}": project is not whitelisted`
                                 }
-                                return ''
-                            }).filter(Boolean).join('; ')
+                                return `"${prItem.project.title}": unknown reason, check me`
+                            }).join('; ')
                         addException(issue, `Does not belong to any allowed projects, details: ${projectsStr}`)
                         continue;
                     }
