@@ -476,6 +476,7 @@ query ($q: String!, $cursor: String!){
         author {
           ... on Actor {
             login
+            url
           }
         }
         assignees (first: 10) {
@@ -483,6 +484,7 @@ query ($q: String!, $cursor: String!){
           nodes {
             ... on User {
               login
+              url
             }
           }
         }

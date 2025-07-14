@@ -49,6 +49,7 @@ export type Issue = {
     },
     author: {
         login: string
+        url: string
     }
     trackedInIssues: {
         totalCount: number
@@ -59,6 +60,7 @@ export type Issue = {
         totalCount: number
         nodes: Array<{
             login: string
+            url: string
         }>
     }
     labels: {

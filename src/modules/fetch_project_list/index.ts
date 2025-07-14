@@ -4,7 +4,7 @@ import {logger} from "../../shared/logger";
 import fs from "fs";
 import {FieldValue, ProjectItem, SearchResult, Issue} from "./types";
 // @ts-ignore
-// import J2M from 'j2m';
+import J2M from 'j2m';
 
 const searchCutOffArr = [
     // `created:>2025-07-01`, // test set
@@ -73,6 +73,21 @@ const projectsAsLabels = [
     'Incident Follow-ups'
 ]
 
+const priorityMap = {
+    'P0':'Blocker',
+    'P1':'Critical',
+    'P2':'Major',
+    'P3':'Minor',
+    '🌋 Urgent':'Critical',
+    '🏔 High':'Major',
+    '🏕 Medium':'Minor',
+    '🏝 Low':'Trivial',
+    '🌋 P0 - High':'Blocker',
+    '🏔 P1 - Moderate':'Critical',
+    '🏕 P2 - Low Priority':'Major',
+    '🏝 P3 - Negligible':'Minor',
+}
+
 // const statusesWhiteList = [
 //     'selected',
 //     'in progress',
@@ -96,20 +111,6 @@ const getIssueId = (issue: Pick<Issue, "number" | "repository">) => {
     return `${issue.repository.name}#${issue.number}`;
 }
 
-const getParentId = (issue: Issue) => {
-    if (issue.trackedInIssues && issue.trackedInIssues.totalCount > 1) {
-        throw new Error('More than one tracked in')
-    }
-    const parent = issue.parent;
-    const trackedIn = issue.trackedInIssues.nodes[0];
-
-    if (parent && trackedIn) {
-        throw new Error('Has both parent and tracked in')
-    }
-
-    return (parent && getIssueId(parent)) || (trackedIn && getIssueId(trackedIn)) || '';
-}
-
 const prepareLabels = (issue: Issue) => {
     const ghLabels = issue.labels.nodes
         .filter((labelNode) => labelNode.name && !labelNode.name.startsWith("c/") && !labelNode.name.startsWith("team/"))
@@ -124,27 +125,40 @@ const prepareLabels = (issue: Issue) => {
     ]
 }
 
-const prepareBody = (issue: Issue, projectItems: ProjectItem[])=> {
+const prepareBody = (issue: Issue, projectItems: ProjectItem[], linksMap: Record<string, string>)=> {
     // todo: replace links
     console.log(issue)
     console.log(projectItems)
 
-    // const projectItemsFieldsText = "## Fields from Neon Github Projects\n\n" + projectItems.map((prItem: any) => {
-    //     let res = `||Field||Value||\n`;
-    //     res = res + prItem.fieldValues.nodes
-    //         .filter((fieldValue: any) => fieldValue.field && fieldValue.field.name && !fieldValue.field.name.includes('🔄') && fieldValue.field.name !== "Title")
-    //         .map((fieldValue: any) => (
-    //             `|${fieldValue.field.name}|${getFieldValue(fieldValue)}|`
-    //         )).join('\n')
-    //
-    //     return `### ${prItem.project.title}\n${res}`;
-    // }).join('\n\n')
-    //
-    // const content = `[Original Github Issue from Neon](${issue.url}), created at ${issue.createdAt}\n\n${issue.body}\n\n${projectItemsFieldsText}`
-    //
-    // const wiki = J2M.toJ(content);
-    // return escape(wiki);
-    return ''
+    const projectItemsFieldsText = "## Fields from Neon Github Projects\n\n" +
+        projectItems.map((prItem) => {
+            let res = `||Field||Value||\n`;
+            res = res + prItem.fieldValues.nodes
+                .filter((fieldValue) => fieldValue.field && fieldValue.field.name && !fieldValue.field.name.includes('🔄') && fieldValue.field.name !== "Title")
+                .map((fieldValue) => (
+                    `|${fieldValue.field.name}|${getFieldValue(fieldValue)}|`
+                )).join('\n')
+
+            return `### ${prItem.project.title}\n${res}`;
+        }).join('\n')
+
+    const reporterLink = `[${issue.author.login}](${issue.author.url})`;
+    const assigneesArr = issue.assignees.nodes.map(user => (`[${user.login}](${user.url})`))
+
+    const originalAssignees = assigneesArr.length ? `GH Assignees: ${assigneesArr.join(', ')}\n\n` : '\n';
+
+    // replacing links to look nicer in body
+    // const mathFullLinks =
+
+    const content = `[Original Github Issue from Neon](${issue.url}), created at ${issue.createdAt} by ${reporterLink}\n` +
+        originalAssignees +
+        issue.body +
+        "\n\n" +
+        projectItemsFieldsText
+
+    const wiki = J2M.toJ(content);
+    return escape(wiki);
+    // return ''
 }
 
 const prepareComponents = (issue:Issue) => {
@@ -185,6 +199,7 @@ const MAX_LABELS = 11;
 const MAX_TEAMS = 5;
 const MAX_COMPONENTS = 5;
 const MAX_ASSIGNEES = 1;
+const MAX_LINKED = 5;
 
 export const fetch_project_list = async (octokit: ProbotOctokit) => {
     console.log("start fetching");
@@ -195,6 +210,7 @@ export const fetch_project_list = async (octokit: ProbotOctokit) => {
         maxProjectsItemsLength: 0,
         maxTeams: 0,
         maxAssignees: 0,
+        maxRelatesTo: 0,
     }
 
     const exportData = [
@@ -206,6 +222,7 @@ export const fetch_project_list = async (octokit: ProbotOctokit) => {
             "issueType",
             "author",
             "parent",
+            ...new Array(MAX_LINKED).fill('relates to'),
             ...new Array(MAX_ASSIGNEES).fill('assignee'),
             ...new Array(MAX_COMPONENTS).fill('component'),
             ...new Array(MAX_TEAMS).fill('team'),
@@ -339,17 +356,16 @@ export const fetch_project_list = async (octokit: ProbotOctokit) => {
                     labelStatuses.length = MAX_TEAMS;
 
                     const id = getIssueId(issue);
-                    const body = prepareBody(issue, whitelistedProjectItems);
+                    const body = prepareBody(issue, whitelistedProjectItems, {});
                     const title = escape(`${issue.title}, ${id}`);
                     const author = issue.author.login // todo: map to databricks emails pending Crystal
-                    let parent = '';
+                    const parent = issue.parent ? getIssueId(issue.parent) : '';
+                    const relatesTo = issue.trackedInIssues.nodes.map(item => getIssueId(item));
+                    stats.maxRelatesTo = Math.max(relatesTo.length, stats.maxRelatesTo);
+                    relatesTo.length = MAX_LINKED;
 
-                    try {
-                        parent = getParentId(issue);
-                    } catch (e: any) {
-                        exportExceptions.push([issue.url, issue.title, e]);
-                        continue;
-                    }
+                    const selectedPriority = mainProjectItem ? priorityMap[tryGetFieldValue("priority", mainProjectItem.fieldValues.nodes) || 'unknown'] || 'unknown' : '';
+
 
                     const issueType = prepareIssueType(issue);
 
@@ -369,6 +385,8 @@ export const fetch_project_list = async (octokit: ProbotOctokit) => {
                             author,
                         //     "parent",
                             parent,
+                        // relates to
+                            ...relatesTo,
                         // assignee
                             ...assignees,
                         //     ...new Array(5).fill('component'),
@@ -386,7 +404,7 @@ export const fetch_project_list = async (octokit: ProbotOctokit) => {
                         // "Selected status",
                             mainProjectItem ? tryGetFieldValue("status", mainProjectItem.fieldValues.nodes) : '',
                         // "Selected priority",
-                            mainProjectItem ? tryGetFieldValue("priority", mainProjectItem.fieldValues.nodes) : '',
+                            selectedPriority,
                         // "Selected size",
                             mainProjectItem ? tryGetFieldValue("size", mainProjectItem.fieldValues.nodes) : '',
                         ]
