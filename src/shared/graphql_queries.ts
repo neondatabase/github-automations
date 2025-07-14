@@ -420,3 +420,125 @@ query($id: ID!){
   }
 }
 `
+
+export const getProjectItemsForExport = `
+query ($q: String!, $cursor: String!){
+  search(query: $q, type: ISSUE, first: 100, after: $cursor){
+    pageInfo {
+      endCursor,
+      hasNextPage,
+      startCursor,
+      hasPreviousPage,
+    }
+    issueCount
+    nodes {
+      ... on Issue {
+        number,
+        title,
+        body,
+        url,
+        createdAt,
+        updatedAt,
+        closedAt,
+        issueType {
+          ... on IssueType {
+            name
+          }
+        }
+        trackedInIssues(last: 5) {
+          totalCount
+          nodes {
+            ... on Issue {
+              repository {
+                ... on Repository {
+                  name
+                }
+              }
+              number
+            }
+          }
+        }
+        parent {
+          ... on Issue {
+            number
+            repository {
+              ... on Repository {
+                name
+              }
+            }
+          }
+        }
+        repository {
+          ... on Repository {
+            name
+          }
+        }
+        author {
+          ... on Actor {
+            login
+            url
+          }
+        }
+        assignees (first: 10) {
+          totalCount
+          nodes {
+            ... on User {
+              login
+              url
+            }
+          }
+        }
+        labels(first: 20) {
+          nodes {
+            ... on Label {
+              name
+            }
+          }
+        }
+        projectItems(first: 10, includeArchived: false) {
+          ... on ProjectV2ItemConnection {
+            nodes{
+              ... on ProjectV2Item {
+                id,
+                isArchived,
+                type,
+                updatedAt,
+                project {
+                  ... on ProjectV2 {
+                    id
+                    title
+                    closedAt
+                  }
+                }
+                fieldValues(first: 15) {
+                  nodes {
+                    ... on ProjectV2ItemFieldValueCommon {
+                      field {
+                          ... on ProjectV2FieldCommon {
+                            id
+                            name 
+                          }
+                        }
+                    }
+                    ... on ProjectV2ItemFieldDateValue {
+                      date
+                    }
+                    ... on ProjectV2ItemFieldSingleSelectValue {
+                      name
+                    }
+                    ... on ProjectV2ItemFieldNumberValue {
+                      number
+                    }
+                    ... on ProjectV2ItemFieldTextValue {
+                      text
+                    }
+                  }
+                },
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}`
